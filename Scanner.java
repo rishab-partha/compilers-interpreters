@@ -1,4 +1,5 @@
 import java.io.IOException;
+
 import java.io.Reader;
 
 /**
@@ -17,50 +18,15 @@ import java.io.Reader;
  *  6. Any other character not defined above.
  * @author Mr. Page
  * @author Rishab Parthasarathy
- * @version 2.7.2019
+ * @version 1.27.2020
  *
  */
 
 public class Scanner
 {
     private Reader in;
-    private String currentChar;
+    private char currentChar;
     private boolean endOfFile;
-    /**
-     * Defines symbolic constants for each type of token.
-     */
-    public static enum TOKEN_TYPE
-    {
-        /**
-         * A non-empty sequence of characters starting with
-         * an alphanumeric character and consisting of alpha characters,
-         * numbers, and special characters (hyphens and apostrophes).
-         */
-        WORD, 
-        /**
-         * A delimiter marking the end of the sentence, which can
-         * be a period, a question mark, or an exclamation mark.
-         */
-        END_OF_SENTENCE, 
-        /**
-         * A delimiter marking the end of the file, which is 
-         * a special end of file token.
-         */
-        END_OF_FILE, 
-        /**
-         * A delimiter marking the end of a phrase, which can be
-         * a colon, semicolon, or comma.
-         */
-        END_OF_PHRASE,
-        /**
-         * One character consisting of a number.
-         */
-        DIGIT, 
-        /**
-         * Any character that does not fit into any of the above classes.
-         */
-        UNKNOWN
-    };
     /**
      * Constructor for Scanner objects.  The Reader object should be one of
      *  1. A StringReader
@@ -97,7 +63,7 @@ public class Scanner
             if(inp == -1) 
                 endOfFile = true;
             else 
-                currentChar = "" + (char) inp;
+                currentChar = (char) inp;
         }
         catch (IOException e)
         {
@@ -118,13 +84,13 @@ public class Scanner
      * and the currentChar instance field is set to the String 
      * representation of the character read from the input stream.  The flag
      * endOfFile is set true if the input stream is exhausted.
-     * @exception IllegalArgumentException if the two characters are not equivalent.
+     * @exception ScanErrorException if the two characters are not equivalent.
      */
     private void eat(String s)
     {
         if (! s.equals(currentChar))
         {
-            throw new IllegalArgumentException("You called method eat with parameter " +
+            throw new ScanErrorException("You called method eat with parameter " +
                 s + " when it expected a value of " + currentChar);
         }
         getNextChar();
@@ -218,7 +184,7 @@ public class Scanner
      * @return true if there are more tokens to parse; else,
      *         return false.
      */
-    public boolean hasNextToken()
+    public boolean hasNext()
     {
         return ! endOfFile;
     }
