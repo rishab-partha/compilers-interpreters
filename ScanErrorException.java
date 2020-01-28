@@ -8,7 +8,7 @@
  * @version 062014
  *
  */
-public class ScanErrorException extends Exception
+public class ScanErrorException extends RuntimeException
 {
     /**
      * default constructor for ScanErrorObjects

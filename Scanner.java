@@ -1,5 +1,4 @@
 import java.io.IOException;
-
 import java.io.Reader;
 
 /**
@@ -86,9 +85,9 @@ public class Scanner
      * endOfFile is set true if the input stream is exhausted.
      * @exception ScanErrorException if the two characters are not equivalent.
      */
-    private void eat(String s)
+    private void eat(char s)
     {
-        if (! s.equals(currentChar))
+        if (! (s == currentChar))
         {
             throw new ScanErrorException("You called method eat with parameter " +
                 s + " when it expected a value of " + currentChar);
@@ -104,10 +103,10 @@ public class Scanner
      * @return true if the character is a letter; else,
      *         return false.
      */
-    private boolean isLetter(String s)
+    public static boolean isLetter(char s)
     {
-        return s.compareTo("A") >= 0  &&  s.compareTo("z") <= 0 
-            && (s.compareTo("Z") <= 0 || s.compareTo("a") >= 0);
+        return s >= 'A' &&  s <= 'z'
+            && (s <= 'Z' || s >= 'a');
     }
 
     /**
@@ -118,50 +117,9 @@ public class Scanner
      * @return true if the character is a digit; else,
      *         return false.
      */
-    private boolean isDigit(String s)
+    public static boolean isDigit(char s)
     {
-        return s.compareTo("0") >= 0 && s.compareTo("9") <= 0;
-    }
-
-    /**
-     * Checks whether a given character is a hyphen or apostrophe using 
-     * the ascii value of the characer.
-     *
-     * @param s A one character string.
-     * @return true if the character is a hyphen or apostrophe; else,
-     *         return false.
-     */
-    private boolean isSpecChar(String s)
-    {
-        return s.equals("'") || s.equals("-");
-    }
-
-    /**
-     * Checks whether a given character is a phrase terminator (colon, semicolon, comma)
-     * using the ascii value of the characer.
-     *
-     * @param s A one character string.
-     * @return true if the character is a phrase terminator (colon, semicolon, comma); else,
-     *         return false.
-     */
-    private boolean isPhraseTerminator(String s)
-    {
-        return s.equals(",") || s.equals(":") || s.equals(";");
-    }
-
-    /**
-     * Checks whether a given character is a 
-     * sentence terminator (period, exclamation mark, question mark)
-     * using the ascii value of the characer.
-     *
-     * @param s A one character string.
-     * @return true if the character is a 
-     *         sentence terminator (period, exclamation mark, question mark); else,
-     *         return false.
-     */
-    private boolean isSentenceTerminator(String s)
-    {
-        return s.equals(".") || s.equals("!") || s.equals("?");
+        return s >= '0' && s <= '9';
     }
 
     /**
@@ -172,9 +130,9 @@ public class Scanner
      * @return true if the character is white space; else,
      *         return false.
      */
-    private boolean isWhiteSpace(String s)
+    public static boolean isWhiteSpace(char s)
     {
-        return s.equals(" ") || s.equals("\t") || s.equals("\n") || s.equals("\r");
+        return s == ' ' || s == '\t' || s == '\n' || s == '\r';
     }
 
     /**
