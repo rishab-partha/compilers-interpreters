@@ -134,6 +134,11 @@ public class Scanner
     {
         return s == ' ' || s == '\t' || s == '\n' || s == '\r';
     }
+    
+    public static boolean isDelimiter(char s)
+    {
+        return s == ';' || s == '(' || s == ')' || s == '{' || s == '}'
+    }
 
     /**
      * Finds whether there are still more tokens to parse
@@ -145,6 +150,21 @@ public class Scanner
     public boolean hasNext()
     {
         return ! endOfFile;
+    }
+
+    private String scanNumber()
+    {
+        String ret = "";
+        if (isDigit(currentChar))
+        {
+            ret += currentChar;
+            eat(currentChar)
+        }
+        else
+        {
+            throw new ScanErrorException("Did not find a number.");
+        }
+        while (!isWhiteSpac)
     }
 
     /**
