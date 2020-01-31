@@ -3,18 +3,14 @@ import java.io.Reader;
 
 /**
  * A Scanner is responsible for reading an input stream, one character at a
- * time, and separating the input into tokens.  A token is defined as:
- *  1. A 'word' which is defined as a non-empty sequence of characters that 
- *     begins with an alpha character and then consists of alpha characters, 
- *     numbers, the single quote character "'", or the hyphen character "-". 
- *  2. An 'end-of-sentence' delimiter defined as any one of the characters 
- *     ".", "?", "!".
- *  3. An end-of-file token which is returned when the scanner is asked for a
- *     token and the input is at the end-of-file.
- *  4. A phrase separator which consists of one of the characters ",",":" or
- *     ";".
- *  5. A digit.
- *  6. Any other character not defined above.
+ * time, and separating the input into tokens after removing
+ * comments. A token is defined as:
+ *  1. A word which is defined as a non-empty sequence of characters that 
+ *     begins with an alpha character and then consists of alpha characters and
+ *     numbers
+ *  2. A number defined as a non-empty sequence of digits
+ *  3. An operand such as multiplication
+ *  4. A delimiter such as a semicolon
  * @author Mr. Page
  * @author Rishab Parthasarathy
  * @version 1.27.2020
@@ -24,8 +20,9 @@ import java.io.Reader;
 public class Scanner
 {
     private Reader in;
-    private char currentChar;
+    private char currentChar; 
     private boolean endOfFile;
+
     /**
      * Constructor for Scanner objects.  The Reader object should be one of
      *  1. A StringReader
@@ -48,7 +45,7 @@ public class Scanner
      * The getNextChar method attempts to get the next character from the input
      * stream.  It sets the endOfFile flag true if the end of file is reached on
      * the input stream.  Otherwise, it reads the next character from the stream
-     * and converts it to a Java String object.
+     * and converts it to a Java character.
      * @postcondition: The input stream is advanced one character if it is not at
      * end of file and the currentChar instance field is set to the String 
      * representation of the character read from the input stream.  The flag
@@ -87,7 +84,7 @@ public class Scanner
      */
     private void eat(char s)
     {
-        if (! (s == currentChar))
+        if (s != currentChar)
         {
             throw new ScanErrorException("You called method eat with parameter " +
                 s + " when it expected a value of " + currentChar);
@@ -99,7 +96,7 @@ public class Scanner
      * Checks whether a given character is a letter using 
      * the ascii value of the characer.
      *
-     * @param s A one character string.
+     * @param s One character.
      * @return true if the character is a letter; else,
      *         return false.
      */
@@ -113,7 +110,7 @@ public class Scanner
      * Checks whether a given character is a digit using 
      * the ascii value of the characer.
      *
-     * @param s A one character string.
+     * @param s One character.
      * @return true if the character is a digit; else,
      *         return false.
      */
@@ -126,7 +123,7 @@ public class Scanner
      * Checks whether a given character is white space
      * using the ascii value of the characer.
      *
-     * @param s A one character string.
+     * @param s one character.
      * @return true if the character is white space; else,
      *         return false.
      */
@@ -134,10 +131,30 @@ public class Scanner
     {
         return s == ' ' || s == '\t' || s == '\n' || s == '\r';
     }
-    
+    /**
+     * Checks whether a given character is a delimiter using 
+     * the ascii value of the characer.
+     *
+     * @param s One character.
+     * @return true if the character is a delimiter; else,
+     *         return false.
+     */
     public static boolean isDelimiter(char s)
     {
-        return s == ';' || s == '(' || s == ')' || s == '{' || s == '}'
+        return s == ';' || s == '(' || s == ')' || s == '{' || s == '}' || s == '[' || s == ']' || s == '.'; 
+    }
+    /**
+     * Checks whether a given character is an operator using 
+     * the ascii value of the characer.
+     *
+     * @param s One character.
+     * @return true if the character is an operator; else,
+     *         return false.
+     */
+    public static boolean isOperatorEqual(char s)
+    {
+        return s == '+' || s == '-' || s == '/' || s == '*' || s == ':' || s == '%' || s == '=' || s == '!' || 
+        s == '<' || s == '>';
     }
 
     /**
@@ -151,20 +168,84 @@ public class Scanner
     {
         return ! endOfFile;
     }
-
-    private String scanNumber()
+    /**
+     * Scans a number by iterating through the input stream.
+     * 
+     * @param cur the current starting character of the number
+     * @precondition the character cur is a 
+     */
+    private String scanNumber(char cur)
     {
         String ret = "";
-        if (isDigit(currentChar))
+        if (isDigit(cur))
         {
-            ret += currentChar;
-            eat(currentChar)
+            ret += cur;
         }
         else
         {
             throw new ScanErrorException("Did not find a number.");
         }
-        while (!isWhiteSpac)
+        while (hasNext() && isDigit(currentChar))
+        {
+            ret += currentChar;
+            eat(currentChar);
+        }
+        return ret;
+    }
+
+    private String scanIdentifier(char cur)
+    {
+        String ret = "";
+        if (isLetter(cur))
+        {
+            ret += cur;
+        }
+        else
+        {
+            throw new ScanErrorException("Did not find a letter.");
+        }
+        while (hasNext() && (isDigit(currentChar) || isLetter(currentChar)))
+        {
+            ret += currentChar;
+            eat(currentChar);
+        }
+        return ret;
+    }
+
+    private String scanOperand(char cur)
+    {
+        String ret = "";
+        if (isOperatorEqual(cur))
+        {
+            ret += cur;
+        }
+        else
+        {
+            throw new ScanErrorException("Did not find a operand.");
+        }
+        if (currentChar == '=')
+        {
+            ret += currentChar;
+            if (hasNext())
+            {
+                eat(currentChar);
+            }
+        }
+        return ret;
+    }
+
+    private String scanDelimiter(char cur)
+    {
+        String ret = "";
+        if (isDelimiter(cur))
+        {
+            ret += cur;
+        }
+        else
+        {
+            throw new ScanErrorException("Did not find a delimiter.");
+        }
+        return ret;
     }
 
     /**
@@ -187,51 +268,72 @@ public class Scanner
      *  the type of token it is (END_OF_FILE, END_OF_SENTENCE, END_OF_PHRASE, DIGIT,
      *  UNKNOWN, or WORD) and the string value of the token itself.
      */
-    public Token nextToken()
+    public String nextToken()
     {
-        while (isWhiteSpace(currentChar) && hasNextToken())
+        while (isWhiteSpace(currentChar) && hasNext())
         {
             eat(currentChar);
         }
-        String curChar = currentChar;
-        TOKEN_TYPE t;
-        if (! isLetter(curChar))
+        if (! hasNext())
         {
-            if (! hasNextToken())
+            return "END";
+        }
+        char cur = currentChar;
+        eat(currentChar);
+        while (cur == '/' && (currentChar == '/' || currentChar == '*'))
+        {
+            if (cur == '/' && currentChar == '/')
             {
-                t = TOKEN_TYPE.END_OF_FILE;
+                while ((currentChar != '\n') && (currentChar != '\r') && hasNext())
+                {
+                    eat(currentChar);
+                }
+                if (hasNext())
+                {
+                    eat(currentChar);
+                }
             }
-            else if (isSentenceTerminator(curChar))
+            else if (cur == '/' && currentChar == '*')
             {
-                t = TOKEN_TYPE.END_OF_SENTENCE;
+                while (!(cur == '*' && currentChar == '/') && hasNext())
+                {
+                    cur = currentChar;
+                    eat(currentChar);
+                }
+                if (hasNext())
+                {
+                    eat(currentChar);
+                }
             }
-            else if (isPhraseTerminator(currentChar))
+            while (isWhiteSpace(currentChar) && hasNext())
             {
-                t = TOKEN_TYPE.END_OF_PHRASE;
+                eat(currentChar);
             }
-            else if (isDigit(currentChar))
+            if (! hasNext())
             {
-                t = TOKEN_TYPE.DIGIT;
+                return "END";
             }
-            else
+            cur = currentChar;
+            if (hasNext())
             {
-                t = TOKEN_TYPE.UNKNOWN;
+                eat(currentChar);
             }
-            eat(curChar);
+        }
+        if (isLetter(cur))
+        {
+            return scanIdentifier(cur);
+        }
+        else if (isDigit(cur))
+        {
+            return scanNumber(cur);
+        }
+        else if (isOperatorEqual(cur))
+        {
+            return scanOperand(cur);
         }
         else
         {
-            curChar = "";
-            String temp = currentChar;
-            while (hasNextToken() && (isLetter(temp) || isDigit(temp) || isSpecChar(temp)))
-            {
-                curChar += temp;
-                eat(temp);
-                temp = currentChar;
-            }
-            curChar = curChar.toLowerCase();
-            t = TOKEN_TYPE.WORD;
+            return scanDelimiter(cur);
         }
-        return new Token(t, curChar);
     }
 }
