@@ -278,12 +278,16 @@ public class Scanner
         {
             return "END";
         }
-        char cur = currentChar;
-        eat(currentChar);
-        while (cur == '/' && (currentChar == '/' || currentChar == '*'))
+        char cur = '';
+        boolean works = true;
+        while (works && currentChar == '/')
         {
-            if (cur == '/' && currentChar == '/')
+            works = false;
+            cur = currentChar;
+            eat(currentChar);
+            if (currentChar == '/')
             {
+                works = true;
                 while ((currentChar != '\n') && (currentChar != '\r') && hasNext())
                 {
                     eat(currentChar);
@@ -295,6 +299,7 @@ public class Scanner
             }
             else if (cur == '/' && currentChar == '*')
             {
+                works = true;
                 while (!(cur == '*' && currentChar == '/') && hasNext())
                 {
                     cur = currentChar;
@@ -312,11 +317,6 @@ public class Scanner
             if (! hasNext())
             {
                 return "END";
-            }
-            cur = currentChar;
-            if (hasNext())
-            {
-                eat(currentChar);
             }
         }
         if (isLetter(cur))
