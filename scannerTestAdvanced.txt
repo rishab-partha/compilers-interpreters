@@ -17,6 +17,7 @@ x := x + 1;
 /*
 hello
 */
+x /= 2;
 END;
 END;
 .

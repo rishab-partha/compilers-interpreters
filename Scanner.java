@@ -174,50 +174,88 @@ public class Scanner
      * @param cur the current starting character of the number
      * @precondition the character cur is a 
      */
-    private String scanNumber(char cur)
+    private String scanNumber()
     {
         String ret = "";
-        if (isDigit(cur))
+        if (isDigit(currentChar))
         {
-            ret += cur;
+            ret += currentChar;
+            if(hasNext())
+            {
+                eat(currentChar);
+            }
+            else
+            {
+                return ret;
+            }
         }
         else
         {
             throw new ScanErrorException("Did not find a number.");
         }
-        while (hasNext() && isDigit(currentChar))
+        while (isDigit(currentChar))
         {
             ret += currentChar;
-            eat(currentChar);
+            if(hasNext())
+            {
+                eat(currentChar);
+            }
+            else
+            {
+                return ret;
+            }
         }
         return ret;
     }
 
-    private String scanIdentifier(char cur)
+    private String scanIdentifier()
     {
         String ret = "";
-        if (isLetter(cur))
+        if (isLetter(currentChar))
         {
-            ret += cur;
+            ret += currentChar;
+            if(hasNext())
+            {
+                eat(currentChar);
+            }
+            else
+            {
+                return ret;
+            }
         }
         else
         {
             throw new ScanErrorException("Did not find a letter.");
         }
-        while (hasNext() && (isDigit(currentChar) || isLetter(currentChar)))
+        while (isDigit(currentChar) || isLetter(currentChar))
         {
             ret += currentChar;
-            eat(currentChar);
+            if(hasNext())
+            {
+                eat(currentChar);
+            }
+            else
+            {
+                return ret;
+            }
         }
         return ret;
     }
 
-    private String scanOperand(char cur)
+    private String scanOperand()
     {
         String ret = "";
-        if (isOperatorEqual(cur))
+        if (isOperatorEqual(currentChar))
         {
-            ret += cur;
+            ret += currentChar;
+            if (hasNext())
+            {
+                eat(currentChar);
+            }
+            else
+            {
+                return ret;
+            }
         }
         else
         {
@@ -234,16 +272,20 @@ public class Scanner
         return ret;
     }
 
-    private String scanDelimiter(char cur)
+    private String scanDelimiter()
     {
         String ret = "";
-        if (isDelimiter(cur))
+        if (isDelimiter(currentChar))
         {
-            ret += cur;
+            ret += currentChar;
         }
         else
         {
             throw new ScanErrorException("Did not find a delimiter.");
+        }
+        if (hasNext())
+        {
+            eat(currentChar);
         }
         return ret;
     }
@@ -278,16 +320,13 @@ public class Scanner
         {
             return "END";
         }
-        char cur = '';
-        boolean works = true;
-        while (works && currentChar == '/')
+        char cur = ' ';
+        while (currentChar == '/')
         {
-            works = false;
             cur = currentChar;
             eat(currentChar);
             if (currentChar == '/')
             {
-                works = true;
                 while ((currentChar != '\n') && (currentChar != '\r') && hasNext())
                 {
                     eat(currentChar);
@@ -299,7 +338,6 @@ public class Scanner
             }
             else if (cur == '/' && currentChar == '*')
             {
-                works = true;
                 while (!(cur == '*' && currentChar == '/') && hasNext())
                 {
                     cur = currentChar;
@@ -319,21 +357,36 @@ public class Scanner
                 return "END";
             }
         }
-        if (isLetter(cur))
+        if (isLetter(currentChar))
         {
-            return scanIdentifier(cur);
+            return scanIdentifier();
         }
-        else if (isDigit(cur))
+        else if (isDigit(currentChar))
         {
-            return scanNumber(cur);
+            return scanNumber();
         }
-        else if (isOperatorEqual(cur))
+        else if (cur == '/')
         {
-            return scanOperand(cur);
+            if (currentChar == '=')
+            {
+                if (hasNext())
+                {
+                    eat(currentChar);
+                }
+                return "/=";
+            }
+            else
+            {
+                return "/";
+            }
+        }
+        else if (isOperatorEqual(currentChar))
+        {
+            return scanOperand();
         }
         else
         {
-            return scanDelimiter(cur);
+            return scanDelimiter();
         }
     }
 }
