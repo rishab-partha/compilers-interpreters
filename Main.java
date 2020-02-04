@@ -11,7 +11,7 @@ public class Main
     /**
      * Method main initializes a BufferedReader on a file and then feeds it to a Scanner.
      * In order to test the scanner, the method forces the Scanner to read the document
-     * for as much as it can.
+     * for as long as it can.
      * 
      * @param args a String array of command line arguments
      * @throws IOException if the File cannot be found and if input goes wrong
