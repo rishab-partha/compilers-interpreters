@@ -5,10 +5,11 @@
  * character in the input stream.  The error is also thrown when the expected
  * value of the character stream does not match the actual value.
  * @author Mr. Page
- * @version 062014
+ *         modified for Javadoc by Rishab Parthasarathy
+ * @version 02.03.2020
  *
  */
-public class ScanErrorException extends RuntimeException
+public class ScanErrorException extends Exception
 {
     /**
      * default constructor for ScanErrorObjects
@@ -19,7 +20,7 @@ public class ScanErrorException extends RuntimeException
     }
     /**
      * Constructor for ScanErrorObjects that includes a reason for the error
-     * @param reason
+     * @param reason the reason that the exception is being thrown
      */
     public ScanErrorException(String reason)
     {

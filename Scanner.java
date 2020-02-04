@@ -3,17 +3,18 @@ import java.io.Reader;
 
 /**
  * A Scanner is responsible for reading an input stream, one character at a
- * time, and separating the input into tokens after removing
+ * time, and separating the input into tokens after removing both inline and multi line
  * comments. A token is defined as:
  *  1. A word which is defined as a non-empty sequence of characters that 
  *     begins with an alpha character and then consists of alpha characters and
  *     numbers
  *  2. A number defined as a non-empty sequence of digits
- *  3. An operand such as multiplication
- *  4. A delimiter such as a semicolon
+ *  3. An operand such as multiplication. This includes multicharacter operands like
+ *     += or !=.
+ *  4. A delimiter such as a semicolon.
  * @author Mr. Page
  * @author Rishab Parthasarathy
- * @version 1.27.2020
+ * @version 2.3.2020
  *
  */
 
@@ -30,9 +31,12 @@ public class Scanner
      *  3. A BufferedReader wrapped around a FileReader
      *  The instance field for the Reader is initialized to the input parameter,
      *  and the endOfFile indicator is set to false.  The currentChar field is
-     *  initialized by the getNextChar method.
+     *  initialized by the getNextChar method. This enables the look ahead process 
+     *  by initializing the character being looked at one ahead. 
      * @param in is the reader object supplied by the program constructing
      *        this Scanner object.
+     * @postcondition the reader is at the first character of the document provided by
+     *                the reader
      */
     public Scanner(Reader in)
     {
@@ -43,13 +47,15 @@ public class Scanner
 
     /**
      * The getNextChar method attempts to get the next character from the input
-     * stream.  It sets the endOfFile flag true if the end of file is reached on
+     * stream. It sets the endOfFile flag true if the end of file is reached on
      * the input stream.  Otherwise, it reads the next character from the stream
-     * and converts it to a Java character.
-     * @postcondition: The input stream is advanced one character if it is not at
-     * end of file and the currentChar instance field is set to the String 
-     * representation of the character read from the input stream.  The flag
-     * endOfFile is set true if the input stream is exhausted.
+     * and converts it to a Java character. In the scenario of an input error,
+     * the method terminates operation and exits.
+     * 
+     * @postcondition The input stream is advanced one character if it is not at
+     *                end of file, and the currentChar instance field is set to the character 
+     *                read from the input stream.  The flag endOfFile is set true if the input 
+     *                stream is exhausted. In the case of an error, the system aborts.
      */
     private void getNextChar()
     {
@@ -72,17 +78,18 @@ public class Scanner
      * The eat method tests whether the character provided is equivalent to the 
      * character stored in the Scanner to insure the security of the eat method and
      * parsing from external intervention. If the characters are unequal, it throws an 
-     * IllegalArgumentException, but if the characters are equal, it advances the input stream
+     * ScanErrorException, but if the characters are equal, it advances the input stream
      * by one. This method is O(1).
+     * 
      * @param s the character to be checked in comparison to the current character
-     * @postcondition: The input stream is advanced one character if it is not at
-     * end of file along with the characters matching up
-     * and the currentChar instance field is set to the String 
-     * representation of the character read from the input stream.  The flag
-     * endOfFile is set true if the input stream is exhausted.
+     * @postcondition The input stream is advanced one character if it is not at
+     *                end of file and if the characters match up. The currentChar instance 
+     *                field is set to the character read from the input stream.  The flag
+     *                endOfFile is set true if the input stream is exhausted. If the
+     *                characters are not equivalent, a ScanErrorException is thrown.
      * @exception ScanErrorException if the two characters are not equivalent.
      */
-    private void eat(char s)
+    private void eat(char s) throws ScanErrorException
     {
         if (s != currentChar)
         {
@@ -141,7 +148,8 @@ public class Scanner
      */
     public static boolean isDelimiter(char s)
     {
-        return s == ';' || s == '(' || s == ')' || s == '{' || s == '}' || s == '[' || s == ']' || s == '.'; 
+        return s == ';' || s == '(' || s == ')' || s == '{' || s == '}' || s == '[' 
+            || s == ']' || s == '.'; 
     }
     /**
      * Checks whether a given character is an operator using 
@@ -153,8 +161,8 @@ public class Scanner
      */
     public static boolean isOperatorEqual(char s)
     {
-        return s == '+' || s == '-' || s == '/' || s == '*' || s == ':' || s == '%' || s == '=' || s == '!' || 
-        s == '<' || s == '>';
+        return s == '+' || s == '-' || s == '/' || s == '*' || s == ':' || s == '%' 
+            || s == '=' || s == '!' || s == '<' || s == '>';
     }
 
     /**
@@ -169,12 +177,18 @@ public class Scanner
         return ! endOfFile;
     }
     /**
-     * Scans a number by iterating through the input stream.
+     * Scans a number by iterating through the input stream. In this definition,
+     * a number is a sequence of digits that is of positive length. The regular
+     * expression is (digit)(digit)*.
      * 
-     * @param cur the current starting character of the number
-     * @precondition the character cur is a 
+     * @return the number parsed by the Scanner
+     * @precondition the current character is a digit
+     * @postcondition the method scanNumber has parsed the whole number token after
+     *                the current character. This is done by iterating until encountering
+     *                a character that is not a digit or until encountering the end of file.
+     * @throws ScanErrorException if the current character is not a digit.
      */
-    private String scanNumber()
+    private String scanNumber() throws ScanErrorException
     {
         String ret = "";
         if (isDigit(currentChar))
@@ -207,8 +221,19 @@ public class Scanner
         }
         return ret;
     }
-
-    private String scanIdentifier()
+    /**
+     * Scans an identifier by iterating through the input stream. In this definition,
+     * an identifier is a letter followed by a sequence of letters and digits
+     * that is of nonnegative length. The regular expression is (letter)(digit | letter)*.
+     * 
+     * @return the identifier parsed by the Scanner
+     * @precondition the current character is a letter
+     * @postcondition the method ScanIdentifier has parsed the whole identifier token after
+     *                the current character. This is done by iterating until encountering
+     *                a character that is not a letter or digit or until the end of file.
+     * @throws ScanErrorException if the current character is not a letter.
+     */
+    private String scanIdentifier() throws ScanErrorException
     {
         String ret = "";
         if (isLetter(currentChar))
@@ -241,8 +266,21 @@ public class Scanner
         }
         return ret;
     }
-
-    private String scanOperand()
+    /**
+     * Scans an operand by iterating through the input stream. In this definition,
+     * an operand is one of +, -, /, *, :, %, !, =, <, or > with or without an equals
+     * sign following it.
+     * 
+     * @return the operand parsed by the Scanner
+     * @precondition the current character is an operand
+     * @postcondition the method scanOperand has parsed the whole operand token after
+     *                the current character. This is done by checking the next character
+     *                after the current character and checking whether it is an equal sign.
+     *                If so, it is added to the operand, and otherwise, the method leaves the
+     *                current character marker at the character after the operand.
+     * @throws ScanErrorException if the current character is not an operand.
+     */
+    private String scanOperand() throws ScanErrorException
     {
         String ret = "";
         if (isOperatorEqual(currentChar))
@@ -271,8 +309,19 @@ public class Scanner
         }
         return ret;
     }
-
-    private String scanDelimiter()
+    /**
+     * Scans a delimiter by observing one character. In this definition,
+     * a delimiter is one of the characters ;, ., (, ), {, }, or [, ].
+     * 
+     * @return the delimiter parsed by the Scanner
+     * @precondition the current character is a delimiter
+     * @postcondition the method scanDelimiter has parsed the whole delimiter token after
+     *                the current character. This is done by reading the one character that
+     *                marked as the current character and moving the marker indicating the 
+     *                current character up by one space.
+     * @throws ScanErrorException if the current character is not a delimiter.
+     */
+    private String scanDelimiter() throws ScanErrorException
     {
         String ret = "";
         if (isDelimiter(currentChar))
@@ -292,25 +341,21 @@ public class Scanner
 
     /**
      * Parses the next Token in the document. A token is defined as
-     *  1. A non-empty sequence of characters starting with
-     *  an alphanumeric character and consisting of alpha characters,
-     *  numbers, and special characters (hyphens and apostrophes).
-     *  2. A delimiter marking the end of the sentence, which can
-     *  be a period, a question mark, or an exclamation mark.
-     *  3. A delimiter marking the end of the file, which is 
-     *  a special end of file token.
-     *  4. A delimiter marking the end of a phrase, which can be
-     *  a colon, semicolon, or comma.
-     *  5. One character consisting of a number.
-     *  6. Any character that does not fit into any of the above classes.
-     *  nextToken parses the document using the eat method and divides the
-     *  input into different types of tokens using the token identification
-     *  helper methods.
-     *  @return the next token in the document as a Token Object which contains
-     *  the type of token it is (END_OF_FILE, END_OF_SENTENCE, END_OF_PHRASE, DIGIT,
-     *  UNKNOWN, or WORD) and the string value of the token itself.
+     *  1. A word which is defined as a non-empty sequence of characters that 
+     *     begins with an alpha character and then consists of alpha characters and
+     *     numbers
+     *  2. A number defined as a non-empty sequence of digits
+     *  3. An operand such as multiplication. This includes multicharacter operands like
+     *     += or !=.
+     *  4. A delimiter such as a semicolon.
+     * First, nextToken eliminates all the whitespace. Then, nextToken looks at possible
+     * comments based on the first character. After that, it eliminates each comment based
+     * on the type as inline or multiline. Then, nextToken parses the document using the eat method 
+     * and helper token reading methods while dividing the input into different types of tokens 
+     * using the token identification helper methods.
+     * @return the next token in the document as a string
      */
-    public String nextToken()
+    public String nextToken() throws ScanErrorException
     {
         while (isWhiteSpace(currentChar) && hasNext())
         {
