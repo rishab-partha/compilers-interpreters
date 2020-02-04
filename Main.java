@@ -4,7 +4,7 @@ import java.io.*;
  * choosing a source document and forcing the scanner to parse it.
  * 
  * @author Rishab Parthasarathy
- * @version 2.3.2020
+ * @version 2.4.2020
  */
 public class Main
 {
@@ -21,7 +21,7 @@ public class Main
      */
     public static void main(String[] args) throws IOException, ScanErrorException
     {
-        BufferedReader in = new BufferedReader(new FileReader("ScannerTest.txt"));
+        BufferedReader in = new BufferedReader(new FileReader("ScannerTestAdvanced.txt"));
         Scanner sc = new Scanner(in);
         while (sc.hasNext())
         {

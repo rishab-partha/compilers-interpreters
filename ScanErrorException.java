@@ -6,7 +6,7 @@
  * value of the character stream does not match the actual value.
  * @author Mr. Page
  *         modified for Javadoc by Rishab Parthasarathy
- * @version 02.03.2020
+ * @version 02.04.2020
  *
  */
 public class ScanErrorException extends Exception

@@ -14,7 +14,7 @@ import java.io.Reader;
  *  4. A delimiter such as a semicolon.
  * @author Mr. Page
  * @author Rishab Parthasarathy
- * @version 2.3.2020
+ * @version 2.4.2020
  *
  */
 
@@ -149,7 +149,7 @@ public class Scanner
     public static boolean isDelimiter(char s)
     {
         return s == ';' || s == '(' || s == ')' || s == '{' || s == '}' || s == '[' 
-            || s == ']' || s == '.'; 
+            || s == ']'; 
     }
     /**
      * Checks whether a given character is an operator using 
@@ -310,8 +310,27 @@ public class Scanner
         return ret;
     }
     /**
+     * Parses whitespace until the end of the file or the next non whitespace character.
+     * 
+     * @postcondition the current character is either end of file or not whitespace
+     * @return true if the file has not ended, false otherwise
+     * @throws ScanErrorException if the currentChar does not match up with the eat parameter
+     */
+    private boolean parseWhiteSpace() throws ScanErrorException
+    {
+        while (isWhiteSpace(currentChar) && hasNext())
+        {
+            eat(currentChar);
+        }
+        if (! hasNext())
+        {
+            return false;
+        }
+        return true;
+    }
+    /**
      * Scans a delimiter by observing one character. In this definition,
-     * a delimiter is one of the characters ;, ., (, ), {, }, or [, ].
+     * a delimiter is one of the characters ;, (, ), {, }, or [, ].
      * 
      * @return the delimiter parsed by the Scanner
      * @precondition the current character is a delimiter
@@ -340,6 +359,20 @@ public class Scanner
     }
 
     /**
+     * Scans an inline comment until the end of a line.
+     * 
+     * @postcondition the end of the file or the end of a line is reached
+     * @throws ScanErrorException if there is a parsing error
+     */
+    private void scanInline() throws ScanErrorException
+    {
+        while ((currentChar != '\n') && (currentChar != '\r') && hasNext())
+        {
+            eat(currentChar);
+        }
+    }
+
+    /**
      * Parses the next Token in the document. A token is defined as
      *  1. A word which is defined as a non-empty sequence of characters that 
      *     begins with an alpha character and then consists of alpha characters and
@@ -357,81 +390,91 @@ public class Scanner
      */
     public String nextToken() throws ScanErrorException
     {
-        while (isWhiteSpace(currentChar) && hasNext())
+        try
         {
-            eat(currentChar);
-        }
-        if (! hasNext())
-        {
-            return "END";
-        }
-        char cur = ' ';
-        while (currentChar == '/')
-        {
-            cur = currentChar;
-            eat(currentChar);
-            if (currentChar == '/')
-            {
-                while ((currentChar != '\n') && (currentChar != '\r') && hasNext())
-                {
-                    eat(currentChar);
-                }
-                if (hasNext())
-                {
-                    eat(currentChar);
-                }
-            }
-            else if (cur == '/' && currentChar == '*')
-            {
-                while (!(cur == '*' && currentChar == '/') && hasNext())
-                {
-                    cur = currentChar;
-                    eat(currentChar);
-                }
-                if (hasNext())
-                {
-                    eat(currentChar);
-                }
-            }
-            while (isWhiteSpace(currentChar) && hasNext())
-            {
-                eat(currentChar);
-            }
-            if (! hasNext())
+            if (! parseWhiteSpace())
             {
                 return "END";
             }
-        }
-        if (isLetter(currentChar))
-        {
-            return scanIdentifier();
-        }
-        else if (isDigit(currentChar))
-        {
-            return scanNumber();
-        }
-        else if (cur == '/')
-        {
-            if (currentChar == '=')
+            char cur = ' ';
+            while (currentChar == '/')
             {
-                if (hasNext())
+                cur = currentChar;
+                eat(currentChar);
+                if (currentChar == '/')
                 {
-                    eat(currentChar);
+                    scanInline();
+                    if (hasNext())
+                    {
+                        eat(currentChar);
+                    }
                 }
-                return "/=";
+                else if (cur == '/' && currentChar == '*')
+                {
+                    while (!(cur == '*' && currentChar == '/') && hasNext())
+                    {
+                        cur = currentChar;
+                        eat(currentChar);
+                    }
+                    if (hasNext())
+                    {
+                        eat(currentChar);
+                    }
+                }
+                if (!parseWhiteSpace())
+                {
+                    return "END";
+                }
+            }
+            if (isLetter(currentChar))
+            {
+                return scanIdentifier();
+            }
+            else if (isDigit(currentChar))
+            {
+                return scanNumber();
+            }
+            else if (cur == '/')
+            {
+                if (currentChar == '=')
+                {
+                    if (hasNext())
+                    {
+                        eat(currentChar);
+                    }
+                    return "/=";
+                }
+                else
+                {
+                    return "/";
+                }
+            }
+            else if (isOperatorEqual(currentChar))
+            {
+                return scanOperand();
+            }
+            else if (isDelimiter(currentChar))
+            {
+                return scanDelimiter();
+            }
+            else if (currentChar == '.')
+            {
+                endOfFile = true;
+                return "END";
             }
             else
             {
-                return "/";
+                throw new ScanErrorException("Unrecognized character in the input stream: " +  currentChar);
             }
         }
-        else if (isOperatorEqual(currentChar))
+        catch (ScanErrorException e)
         {
-            return scanOperand();
-        }
-        else
-        {
-            return scanDelimiter();
+            //char c = currentChar;
+            //eat(currentChar);
+            //return "Unrecognized Token: " + c;
+            e.printStackTrace();
+            System.exit(-1);
+            return null;
         }
     }
 }
