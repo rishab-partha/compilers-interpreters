@@ -1,4 +1,4 @@
-
+package scanner;
 /**
  * ScanErrorException is a sub class of Exception and is thrown to indicate a 
  * scanning error.  Usually, the scanning error is the result of an illegal 

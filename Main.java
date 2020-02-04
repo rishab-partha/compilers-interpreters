@@ -1,4 +1,5 @@
 import java.io.*;
+import scanner.*;
 /**
  * This Main class is responsible for testing the scanner by
  * choosing a source document and forcing the scanner to parse it.
