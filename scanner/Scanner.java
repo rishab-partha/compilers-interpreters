@@ -389,8 +389,8 @@ public class Scanner
      * using the token identification helper methods. If a ScanErrorException is thrown, nextToken
      * prints the error and exits from the system.
      * 
-     * @postcondition The program has either parsed and reached either the end of the token or the end of file
-     *                or the program has crashed.
+     * @postcondition The program has either parsed and reached either the end of the token 
+     *                or the end of file or crashed.
      * @return the next token in the document as a string
      */
     public String nextToken()
@@ -469,7 +469,8 @@ public class Scanner
             }
             else
             {
-                throw new ScanErrorException("Unrecognized character in the input stream: " +  currentChar);
+                throw new ScanErrorException("Unrecognized character in the input stream: " +
+                    currentChar);
             }
         }
         catch (ScanErrorException e)
