@@ -16,11 +16,8 @@ public class Main
      * 
      * @param args a String array of command line arguments
      * @throws IOException if the File cannot be found and if input goes wrong
-     * @throws ScanErrorException if there some internal error thrown by the Scanner such
-     *                            as the eat not matching up or the number not starting
-     *                            with a digit.
      */
-    public static void main(String[] args) throws IOException, ScanErrorException
+    public static void main(String[] args) throws IOException
     {
         BufferedReader in = new BufferedReader(new FileReader("Scanner//ScannerTest.txt"));
         Scanner sc = new Scanner(in);
