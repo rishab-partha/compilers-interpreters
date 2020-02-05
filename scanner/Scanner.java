@@ -386,10 +386,14 @@ public class Scanner
      * comments based on the first character. After that, it eliminates each comment based
      * on the type as inline or multiline. Then, nextToken parses the document using the eat method 
      * and helper token reading methods while dividing the input into different types of tokens 
-     * using the token identification helper methods.
+     * using the token identification helper methods. If a ScanErrorException is thrown, nextToken
+     * prints the error and exits from the system.
+     * 
+     * @postcondition The program has either parsed and reached either the end of the token or the end of file
+     *                or the program has crashed.
      * @return the next token in the document as a string
      */
-    public String nextToken() throws ScanErrorException
+    public String nextToken()
     {
         try
         {
@@ -470,9 +474,9 @@ public class Scanner
         }
         catch (ScanErrorException e)
         {
-            //char c = currentChar;
-            //eat(currentChar);
-            //return "Unrecognized Token: " + c;
+            // char c = currentChar;
+            // eat(currentChar);
+            // return "Unrecognized Token: " + c;
             e.printStackTrace();
             System.exit(-1);
             return null;
