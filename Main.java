@@ -19,7 +19,7 @@ public class Main
      */
     public static void main(String[] args) throws IOException
     {
-        BufferedReader in = new BufferedReader(new FileReader("Scanner//ScannerTestAdvanced.txt"));
+        BufferedReader in = new BufferedReader(new FileReader("Scanner//ScannerTest.txt"));
         Scanner sc = new Scanner(in);
         while (sc.hasNext())
         {
