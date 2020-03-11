@@ -1,6 +1,5 @@
 package scanner;
-import java.io.IOException;
-import java.io.Reader;
+import java.io.*;
 
 /**
  * A Scanner is responsible for reading an input stream, one character at a
@@ -42,6 +41,24 @@ public class Scanner
     public Scanner(Reader in)
     {
         this.in = in;
+        endOfFile = false;
+        getNextChar();
+    }
+
+    /**
+     *  Constructor for Scanner objects.  The parameter should be an input stream.
+     *  The instance field for the Reader is initialized to the input parameter,
+     *  and the endOfFile indicator is set to false.  The currentChar field is
+     *  initialized by the getNextChar method. This enables the look ahead process 
+     *  by initializing the character being looked at one ahead. 
+     *  @param in is the input stream object supplied by the program constructing
+     *        this Scanner object.
+     *  @postcondition the input stream is at the first character of the document provided by
+     *        the input stream
+     */
+    public Scanner(InputStream inStream)
+    {
+        this.in = new BufferedReader(new InputStreamReader(inStream));
         endOfFile = false;
         getNextChar();
     }
@@ -431,15 +448,7 @@ public class Scanner
                     return "END";
                 }
             }
-            if (isLetter(currentChar))
-            {
-                return scanIdentifier();
-            }
-            else if (isDigit(currentChar))
-            {
-                return scanNumber();
-            }
-            else if (cur == '/')
+            if (cur == '/')
             {
                 if (currentChar == '=')
                 {
@@ -453,6 +462,14 @@ public class Scanner
                 {
                     return "/";
                 }
+            }
+            else if (isLetter(currentChar))
+            {
+                return scanIdentifier();
+            }
+            else if (isDigit(currentChar))
+            {
+                return scanNumber();
             }
             else if (isOperatorEqual(currentChar))
             {
