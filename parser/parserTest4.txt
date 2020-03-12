@@ -4,4 +4,10 @@ BEGIN
     x := x + y;
     WRITELN(x * y);
 END;
+BEGIN
+    READLN(x);
+    READLN(y);
+    READLN(z);
+    WRITELN(x * y % z);
+END;
 .

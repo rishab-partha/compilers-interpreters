@@ -1,5 +1,6 @@
 import java.io.*;
 import scanner.*;
+import parser.*;
 /**
  * This Main class is responsible for testing the scanner by
  * choosing a source document and forcing the scanner to parse it.
@@ -19,11 +20,12 @@ public class Main
      */
     public static void main(String[] args) throws IOException
     {
-        BufferedReader in = new BufferedReader(new FileReader("parser//parsertest3.txt"));
+        BufferedReader in = new BufferedReader(new FileReader("parser//parsertest4.txt"));
         Scanner sc = new Scanner(in);
+        Parser p = new Parser(sc);
         while (sc.hasNext())
         {
-            System.out.println(sc.nextToken());
+            p.parseStatement();
         }
     }   
 }

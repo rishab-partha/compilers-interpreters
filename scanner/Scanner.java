@@ -416,7 +416,7 @@ public class Scanner
         {
             if (! parseWhiteSpace())
             {
-                return "END";
+                return ".";
             }
             char cur = ' ';
             while (currentChar == '/')
@@ -445,7 +445,7 @@ public class Scanner
                 }
                 if (!parseWhiteSpace())
                 {
-                    return "END";
+                    return ".";
                 }
             }
             if (cur == '/')
@@ -482,7 +482,7 @@ public class Scanner
             else if (currentChar == '.')
             {
                 endOfFile = true;
-                return "END";
+                return ".";
             }
             else
             {
