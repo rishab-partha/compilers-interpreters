@@ -1,6 +1,5 @@
 package parser;
 import scanner.*;
-import java.lang.IllegalArgumentException;
 import java.util.Map;
 import java.util.HashMap;
 /**
@@ -119,8 +118,10 @@ public class Parser
         {
             eat("WRITELN");
             eat("(");
-            System.out.println(parseExpression());
+            int ret =parseExpression();
             eat(")");
+            eat(";");
+            System.out.println(ret);
         }
         else if (curToken.equals("READLN"))
         {
@@ -128,9 +129,10 @@ public class Parser
             eat("(");
             String id = curToken;
             int val = scinput.nextInt();
-            variables.put(id, val);
             eat (id);
             eat(")");
+            eat(";");
+            variables.put(id, val);
         }
         else if (curToken.equals("BEGIN"))
         {
@@ -140,6 +142,7 @@ public class Parser
                 parseStatement();
             }
             eat("END");
+            eat(";");
         }
         else
         {
@@ -147,9 +150,9 @@ public class Parser
             eat(varname);
             eat(":=");
             int ret = parseExpression();
+            eat(";");
             variables.put(varname, ret);
         }
-        eat(";");
     }
     /**
      * Method parseFactor parses four types of factors (simplest form of an expression):
