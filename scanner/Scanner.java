@@ -287,7 +287,7 @@ public class Scanner
     /**
      * Scans an operand by iterating through the input stream. In this definition,
      * an operand is one of +, -, /, *, :, %, !, =, <, or > with or without an equals
-     * sign following it.
+     * sign following it. The one other operand possible is <>.
      * 
      * @return the operand parsed by the Scanner
      * @precondition the current character is an operand
@@ -317,7 +317,15 @@ public class Scanner
         {
             throw new ScanErrorException("Did not find a operand.");
         }
-        if (currentChar == '=')
+        if (ret.equals("<") && currentChar == '>')
+        {
+            ret += currentChar;
+            if (hasNext())
+            {
+                eat(currentChar);
+            }
+        }
+        else if (currentChar == '=')
         {
             ret += currentChar;
             if (hasNext())

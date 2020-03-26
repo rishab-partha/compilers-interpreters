@@ -1,18 +1,7 @@
 package parser;
 import scanner.*;
-import java.util.List;
-import java.util.ArrayList;
-import ast.Number;
-import ast.BinOp;
-import ast.Block;
-import ast.Assignment;
-import ast.Variable;
-import ast.Writeln;
-import ast.Expression;
-import ast.Statement;
-import ast.Condition;
-import ast.If;
-import ast.While;
+import java.util.Map;
+import java.util.HashMap;
 /**
  * A Parser uses the stream of tokens from a Scanner in order to 
  * execute simple commands and calculate simple expressions.
@@ -26,16 +15,15 @@ import ast.While;
  * 3. Write the value of a certain expression to standard output using the command WRITELN
  * 4. Declaring/Assigning a variable to a value using the symbol ":="
  * 5. Perform block expressions delineated by BEGIN and END
- * 6. Perform IF statements
- * 7. Perform WHILE loops
  * @author Rishab Parthasarathy
- * @version 3.25.2020
+ * @version 3.13.2020
  */
-public class Parser
+public class ParserOrig
 {
     private Scanner sc;
     private java.util.Scanner scinput;
     private String curToken;
+    private Map<String, Integer> variables;
     /**
      * A constructor for the Parser. Uses a Scanner that has been previously
      * written to tokenize the input into a stream of lexemes. This scanner
@@ -48,10 +36,11 @@ public class Parser
      * @postcondition The Parser is currently observing the first token within the input
      *                document
      */
-    public Parser(Scanner s)
+    public ParserOrig(Scanner s)
     {
         sc = s;
         curToken = sc.nextToken();
+        variables = new HashMap<String, Integer>();
         scinput = new java.util.Scanner(System.in);
     }
     /**
@@ -82,19 +71,18 @@ public class Parser
     }
     /**
      * Method parseNumber takes the string version of the current token
-     * and turns it into an Number, or an integer in the AST and advances the 
-     * input stream by one token. This method also throws a NumberFormatException 
-     * if there is no number to parse.
+     * and turns it into an integer, or number and also advances the input stream by one token. 
+     * This method also throws a NumberFormatException if there is no number to parse.
      * 
      * @precondition The parser is currently observing a token that is an integer
      * @postcondition The integer token has been eaten and parsed
-     * @return an AST Number containing the value
+     * @return the value of the integer token
      */
-    private Number parseNumber()
+    private int parseNumber()
     {
         int ret = Integer.parseInt(curToken);
         eat(curToken);
-        return new Number(ret);
+        return ret;
     }
     /**
      * Method parseStatement tries to parse 4 types of commands:
@@ -117,35 +105,23 @@ public class Parser
      *        expr denotes an expression containing numbers, parentheses, 
      *        and arithmetic operations and var denotes a variable name. This method
      *        stores the variable name in a map and assigns the key to the value of the expression
-     *     5. IF statements of the format
-     *        IF cond THEN stmt (ELSE stmt) where the else is optional. cond represents a boolean
-     *        condition and the stmts refer to statements. If the condition is true, the statement
-     *        within the then is executed, but if the condition is false, the else statement is   
-     *        executed whenever it exists.
-     *     6. WHILE loops of the format
-     *        WHILE cond DO stmt. cond represents a boolean condition and stmt refers to a
-     *        statement. While the condition is true, the statement is executed.
      * 
-     * This method stores all of these 6 functionalities within nodes of the Abstract
-     * Syntax Tree or AST. This allows the AST to simplify and evaluate everything
-     * more efficiently after all of the parsing is done.
-     * 
-     * @precondition The parser is currently observing a token that begins one of the 6
+     * @precondition The parser is currently observing a token that begins one of the 4
      *               command types described above
-     * @postcondition The command has been transformed to part of an AST andthe parser has 
-     *                eaten/parsed the entirety of the command
-     * @return the AST portion referring to the statement that has been parsed
+     * @postcondition The command has been properly executed and the parser has eaten/parsed
+     *                the entirety of the command
+     *                
      */
-    public Statement parseStatement()
+    public void parseStatement()
     {
-        Statement ret;
         if (curToken.equals("WRITELN"))
         {
             eat("WRITELN");
             eat("(");
-            ret = new Writeln(parseExpression());
+            int ret =parseExpression();
             eat(")");
             eat(";");
+            System.out.println(ret);
         }
         else if (curToken.equals("READLN"))
         {
@@ -153,54 +129,30 @@ public class Parser
             eat("(");
             String id = curToken;
             int val = scinput.nextInt();
-            ret = new Assignment(id, new Number(val));
             eat (id);
             eat(")");
             eat(";");
+            variables.put(id, val);
         }
         else if (curToken.equals("BEGIN"))
         {
             eat("BEGIN");
-            List<Statement> statements = new ArrayList<Statement>();
             while (! curToken.equals("END"))
             {
-                statements.add(parseStatement());
+                parseStatement();
             }
             eat("END");
             eat(";");
-            ret = new Block(statements);
-        }
-        else if (curToken.equals("IF"))
-        {
-            eat("IF");
-            Condition cond = parseCondition();
-            eat("THEN");
-            Statement st1 = parseStatement();
-            Statement st2 = null;
-            if (curToken.equals("ELSE"))
-            {
-                eat("ELSE");
-                st2 = parseStatement();
-            }
-            ret = new If(cond, st1, st2);
-        }
-        else if (curToken.equals("WHILE"))
-        {
-            eat("WHILE");
-            Condition cond = parseCondition();
-            eat("DO");
-            Statement st = parseStatement();
-            ret = new While(cond, st);
         }
         else
         {
             String varname = curToken;
             eat(varname);
             eat(":=");
-            ret = new Assignment(varname, parseExpression());
+            int ret = parseExpression();
             eat(";");
+            variables.put(varname, ret);
         }
-        return ret;
     }
     /**
      * Method parseFactor parses four types of factors (simplest form of an expression):
@@ -217,13 +169,13 @@ public class Parser
      * 
      * @precondition The parser is currently observing a token that begins one of the 4
      *               factor types described above
-     * @postcondition The factor has been properly transformed to an AST component and the parser 
-     *                has eaten/parsed the entirety of the factor
-     * @return the factor as an AST Expression
+     * @postcondition The factor has been properly computed and the parser has eaten/parsed
+     *                the entirety of the factor
+     * @return the value of the factor
      */
-    private Expression parseFactor()
+    private int parseFactor()
     {
-        Expression ret;
+        int ret;
         if (curToken.equals("("))
         {
             eat("(");
@@ -234,19 +186,16 @@ public class Parser
         {
             eat("-");
             ret = parseFactor();
-            ret = new BinOp("-", new Number(0), ret);
+            ret *= -1;
+        }
+        else if (variables.containsKey(curToken))
+        {
+            ret = variables.get(curToken);
+            eat(curToken);
         }
         else
         {
-            try
-            {
-                ret = parseNumber();
-            }
-            catch (NumberFormatException n)
-            {
-                ret = new Variable(curToken);
-                eat(curToken);
-            }
+            ret = parseNumber();
         }
         return ret;
     }
@@ -267,24 +216,35 @@ public class Parser
      * definitions 1-3 and 4, so instead of using a naive implementation, we notice that each term
      * consists of factors separated by the operators *, /, and %, and is evaluated from left to
      * right. Thus, we use a while loop to loop from the first factor until a separator is
-     * observed between two factors that is not *, /, or %. While doing this, we recursively create
-     * the AST component by recursively creating descent while making sure that the rightmost
-     * operator is at the top in order to maintain proper order of operations.
+     * observed between two factors that is not *, /, or %. While doing this, we keep a running
+     * return value to return when the operations are done.
      * 
      * @precondition The parser is currently observing a token that begins one of the 4
      *               term types described above
-     * @postcondition The term has been properly turned into an AST Expression and the parser 
-     *                has eaten/parsed the entirety of the term
-     * @return the term as an AST Expression
+     * @postcondition The term has been properly computed and the parser has eaten/parsed
+     *                the entirety of the term
+     * @return the value of the term
      */
-    private Expression parseTerm()
+    private int parseTerm()
     {
-        Expression ret = parseFactor();
+        int ret = parseFactor();
         while (curToken.equals("*") || curToken.equals("/") || curToken.equals("%"))
         {
-            String cur = curToken;
-            eat(curToken);
-            ret = new BinOp(cur, ret, parseTerm());
+            if (curToken.equals("*"))
+            {
+                eat("*");
+                ret *= parseFactor();
+            }
+            else if (curToken.equals("%"))
+            {
+                eat("%");
+                ret %= parseFactor();
+            }
+            else
+            {
+                eat("/");
+                ret /= parseFactor();
+            }
         }
         return ret;
     }
@@ -304,54 +264,31 @@ public class Parser
      * definitions 1-2 and 3, so instead of using a naive implementation, we notice that each
      * expression consists of terms separated by the operators + and - and is evaluated from 
      * left to right. Thus, we use a while loop to loop from the first term until a separator is
-     * observed between two terms that is not + or -. While doing this, we recursively create
-     * the AST component by recursively creating descent while making sure that the rightmost
-     * operator is at the top in order to maintain proper order of operations.
+     * observed between two terms that is not + or -. While doing this, we keep a running
+     * return value to return when the operations are done.
      * 
      * @precondition The parser is currently observing a token that begins one of the 3
      *               expression types described above
-     * @postcondition The expression has been properly turned into an AST Expression and the 
-     *                parser has eaten/parsed the entirety of the expression
-     * @return the expression as an AST Expression
+     * @postcondition The expression has been properly computed and the parser has eaten/parsed
+     *                the entirety of the expression
+     * @return the value of the expression
      */
-    private Expression parseExpression()
+    private int parseExpression()
     {
-        Expression ret = parseTerm();
+        int ret = parseTerm();
         while (curToken.equals("+") || curToken.equals("-"))
         {
-            String cur = curToken;
-            eat(curToken);
-            ret = new BinOp(cur, ret, parseTerm());
+            if (curToken.equals("+"))
+            {
+                eat("+");
+                ret += parseTerm();
+            }
+            else
+            {
+                eat("-");
+                ret -= parseTerm();
+            }
         }
         return ret;
-    }
-    /**
-     * Method parseCondition parses a boolean condition of one format:
-     * Expr RelOp Expr
-     * where the two Exprs are two expressions, and the RelOp is an operator that is one of the
-     * following six: =, <>, <, >, <=, >=. These operators are equality, inequality, less than,
-     * greater than, less than or equal to, and greater than or equal to, respectively. These
-     * conditions have a value that is dependent on the association between the values of the
-     * two expressions created by the relacional operator. This method stores these conditions
-     * within an AST Expression so that the AST can easily evaluate these boolean values.
-     * 
-     * @precondition The parser is on the beginning of a condition of the format described above,
-     *               with two expressions separated by a relacional operator
-     * @postcondition The entire condition has been eaten/parsed, and the condition has also been
-     *                transformed into an AST Expression
-     * @return the AST Expression representing the Condition
-     */
-    private Condition parseCondition()
-    {
-        Expression exp1 = parseExpression();
-        String operator = "";
-        if (curToken.equals("=") || curToken.equals("<>") || curToken.equals("<") || 
-            curToken.equals(">") || curToken.equals(">=") || curToken.equals("<="))
-        {
-            operator = curToken;
-            eat(curToken);
-        }
-        Expression exp2 = parseExpression();
-        return new Condition(operator, exp1, exp2);
     }
 }
