@@ -1,5 +1,5 @@
 package environment;
-
+import ast.ProcedureDeclaration;
 import java.util.Map;
 import java.util.HashMap;
 /**
@@ -12,6 +12,7 @@ import java.util.HashMap;
 public class Environment
 {
     private Map<String, Integer> variables;
+    private Map<String, ProcedureDeclaration> procedures;
     /**
      * This constructor initializes the map of variables to be empty.
      * 
@@ -20,6 +21,7 @@ public class Environment
     public Environment()
     {
         variables = new HashMap<>();
+        procedures = new HashMap<>();
     }
     /**
      * This method sets the value of a String variable identifier to a integer value
@@ -46,14 +48,26 @@ public class Environment
      */
     public int getVariable(String variable)
     {
-        int ret;
-        if (variables.containsKey(variable))
+        if (! variables.containsKey(variable))
         {
-            ret = variables.get(variable);
+            variables.put(variable, 0);
+        }
+        return variables.get(variable);
+    }
+    public void setProcedure(String procedure, ProcedureDeclaration dec)
+    {
+        procedures.put(procedure, dec);
+    }
+    public ProcedureDeclaration(String procedure)
+    {
+        ProcedureDeclaration ret;
+        if (procedures.containsKey(procedure))
+        {
+            ret = procedures.get(procedure);
         }
         else
         {
-            throw new IllegalArgumentException("Variable " + variable + " not recognized");
+            throw IllegalArgumentException("Procedure " + procedure + " is not defined.");
         }
         return ret;
     }
