@@ -13,15 +13,17 @@ public class Environment
 {
     private Map<String, Integer> variables;
     private Map<String, ProcedureDeclaration> procedures;
+    Environment par;
     /**
      * This constructor initializes the map of variables to be empty.
      * 
      * @postcondition the map of variables is initialized and empty
      */
-    public Environment()
+    public Environment(Environment p)
     {
         variables = new HashMap<>();
         procedures = new HashMap<>();
+        par = p;
     }
     /**
      * This method sets the value of a String variable identifier to a integer value
@@ -33,7 +35,20 @@ public class Environment
      */
     public void setVariable(String variable, int value)
     {
+        if (!variables.containsKey(variable) && par != null && par.containsVariable(variable))
+        {
+            par.setVariable(variable, value);
+            return;
+        }
         variables.put(variable, value);
+    }
+    public void declareVariable(String variable, int value)
+    {
+        variables.put(variable, value);
+    }
+    public boolean containsVariable(String variable)
+    {
+        return variables.containsKey(variable);
     }
     /**
      * This method tries to retrieve the value associated with a variable from the map
@@ -48,18 +63,32 @@ public class Environment
      */
     public int getVariable(String variable)
     {
-        if (! variables.containsKey(variable))
+        if (variables.containsKey(variable))
+        {
+            return variables.get(variable);
+        }
+        else if (par == null)
         {
             variables.put(variable, 0);
+            return 0;
         }
-        return variables.get(variable);
+        return par.getVariable(variable);
     }
     public void setProcedure(String procedure, ProcedureDeclaration dec)
     {
+        if (par != null)
+        {
+            par.setProcedure(procedure, dec);
+            return;
+        }
         procedures.put(procedure, dec);
     }
-    public ProcedureDeclaration(String procedure)
+    public ProcedureDeclaration getProcedure(String procedure)
     {
+        if (par != null)
+        {
+            return par.getProcedure(procedure);
+        }
         ProcedureDeclaration ret;
         if (procedures.containsKey(procedure))
         {
@@ -67,7 +96,7 @@ public class Environment
         }
         else
         {
-            throw IllegalArgumentException("Procedure " + procedure + " is not defined.");
+            throw new IllegalArgumentException("Procedure " + procedure + " is not defined.");
         }
         return ret;
     }

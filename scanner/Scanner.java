@@ -167,7 +167,7 @@ public class Scanner
     public static boolean isDelimiter(char s)
     {
         return s == ';' || s == '(' || s == ')' || s == '{' || s == '}' || s == '[' 
-            || s == ']'; 
+            || s == ']' || s == ','; 
     }
     /**
      * Checks whether a given character is an operator using 

@@ -13,6 +13,10 @@ import ast.Statement;
 import ast.Condition;
 import ast.If;
 import ast.While;
+import ast.ProcedureCall;
+import ast.ProcedureDeclaration;
+import ast.Program;
+import ast.ProcedureCallStmt;
 /**
  * A Parser uses the stream of tokens from a Scanner in order to 
  * execute simple commands and calculate simple expressions.
@@ -196,8 +200,28 @@ public class Parser
         {
             String varname = curToken;
             eat(varname);
-            eat(":=");
-            ret = new Assignment(varname, parseExpression());
+            if (curToken.equals(":="))
+            {
+                eat(":=");
+                ret = new Assignment(varname, parseExpression());
+            }
+            else
+            {
+                eat("(");
+                List<Expression> variables = new ArrayList<>();
+                if (!curToken.equals(")"))
+                {
+                    variables.add(parseExpression());
+                }
+                while (! curToken.equals(")"))
+                {
+                    eat(",");
+                    variables.add(parseExpression());
+                }
+                eat(")");
+                ret = new ProcedureCallStmt(varname, variables);
+
+            }
             eat(";");
         }
         return ret;
@@ -244,8 +268,28 @@ public class Parser
             }
             catch (NumberFormatException n)
             {
-                ret = new Variable(curToken);
+                String s = curToken;
                 eat(curToken);
+                if (curToken.equals("("))
+                {
+                    eat("(");
+                    List<Expression> variables = new ArrayList<>();
+                    if (!curToken.equals(")"))
+                    {
+                        variables.add(parseExpression());
+                    }
+                    while (! curToken.equals(")"))
+                    {
+                        eat(",");
+                        variables.add(parseExpression());
+                    }
+                    eat(")");
+                    ret = new ProcedureCall(s, variables);
+                }
+                else
+                {
+                    ret = new Variable(s);
+                }
             }
         }
         return ret;
@@ -353,5 +397,34 @@ public class Parser
         }
         Expression exp2 = parseExpression();
         return new Condition(operator, exp1, exp2);
+    }
+    public Program parseProgram()
+    {
+        List<ProcedureDeclaration> ls = new ArrayList<>();
+        while (curToken.equals("PROCEDURE"))
+        {
+            eat("PROCEDURE");
+            String s = curToken;
+            eat(curToken);
+            eat("(");
+            List<String> params = new ArrayList<>();
+            if (!curToken.equals(")"))
+            {
+                params.add(curToken);
+                eat(curToken);
+            }
+            while (! curToken.equals(")"))
+            {
+                eat(",");
+                params.add(curToken);
+                eat(curToken);
+            }
+            eat(")");
+            eat(";");
+            Statement st = parseStatement();
+            ls.add(new ProcedureDeclaration(s, st, params));
+        }
+        Statement st = parseStatement();
+        return new Program(ls, st);
     }
 }

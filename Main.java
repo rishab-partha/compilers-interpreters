@@ -23,13 +23,10 @@ public class Main
      */
     public static void main(String[] args) throws IOException
     {
-        BufferedReader in = new BufferedReader(new FileReader("parser//parsertest6.txt"));
+        BufferedReader in = new BufferedReader(new FileReader("parser//parsertest8.txt"));
         Scanner sc = new Scanner(in);
         Parser p = new Parser(sc);
-        Environment env = new Environment();
-        while (sc.hasNext())
-        {
-            p.parseStatement().exec(env);
-        }
+        Environment env = new Environment(null);
+        p.parseProgram().exec(env);
     }   
 }

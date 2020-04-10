@@ -1,4 +1,6 @@
 package ast;
+import environment.Environment;
+import java.util.*;
 /**
  * The Assignment class encodes a type of statement
  * where a String variable name is associated with the value of 
@@ -8,8 +10,9 @@ package ast;
  */
 public class ProcedureDeclaration extends Statement
 {
-    private String var;
-    private Statement exp;
+    private String name;
+    private Statement st;
+    private List<String> params;
     /**
      * The Constructor initializes the string value of the value name and
      * the expression to which the variable is to be equated through input parameters.
@@ -17,10 +20,11 @@ public class ProcedureDeclaration extends Statement
      * @param v The name of the variable
      * @param e The expression equal to the value of the variable
      */
-    public Assignment(String v, Statement e)
+    public ProcedureDeclaration(String v, Statement e, List<String> paramList)
     {
-        var = v;
-        exp = e;
+        name = v;
+        st = e;
+        params = paramList;
     }
     /**
      * Method exec assigns the variable to the value of the expression within the environment
@@ -32,6 +36,14 @@ public class ProcedureDeclaration extends Statement
      */
     public void exec(Environment env)
     {
-        env.setProcedure(var, self);
+        env.setProcedure(name, this);
+    }
+    public Statement getStatement()
+    {
+        return st;
+    }
+    public List<String> getParams()
+    {
+        return params;
     }
 }

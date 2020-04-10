@@ -34,9 +34,10 @@ public class While extends Statement
      **/
     public void exec(Environment env)
     {
+        Environment env1 = new Environment(env);
         while(c.eval(env) == 1)
         {
-            s.exec(env);
+            s.exec(env1);
         }
     }
 }

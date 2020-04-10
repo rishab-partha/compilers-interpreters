@@ -41,13 +41,14 @@ public class If extends Statement
      **/
     public void exec(Environment env)
     {
+        Environment env1 = new Environment(env);
         if (c.eval(env) == 1)
         {
-            s1.exec(env);
+            s1.exec(env1);
         }
         else if (s2 != null)
         {
-            s2.exec(env);
+            s2.exec(env1);
         }
     }
 }
