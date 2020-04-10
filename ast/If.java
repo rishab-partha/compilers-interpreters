@@ -7,7 +7,7 @@ import environment.Environment;
  * and if the condition is false and the else exists, the statement within
  * the else is executed.
  * @author Rishab Parthasarathy
- * @version 03.25.2020
+ * @version 04.10.2020
  */
 public class If extends Statement
 {
@@ -33,7 +33,8 @@ public class If extends Statement
      * Method exec executes the IF statement. First, it tries to evaluate the condition.
      * If the condition is true, the statement within the THEN block is executed. If the
      * condition is false, the statement within the ELSE block is executed if the ELSE block
-     * exists. Otherwise, nothing is done.
+     * exists. Otherwise, nothing is done. Also, when the block of code is executed, a new 
+     * child environment is created in order to create local variables.
      * 
      * @param env the environment within which operations are occuring
      * @precondition The condition and statements are executeable

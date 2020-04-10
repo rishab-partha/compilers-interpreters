@@ -6,7 +6,7 @@ import environment.Environment;
  * the condition is tested, and while the condition remains true,
  * the statement within the do is executed.
  * @author Rishab Parthasarathy
- * @version 03.25.2020
+ * @version 04.10.2020
  */
 public class While extends Statement
 {
@@ -26,11 +26,12 @@ public class While extends Statement
     /**
      * Method exec executes the WHILE loop. How it does so is for every iteration,
      * it checks whether the condition is true, and while the condition is still true,
-     * the statement within the DO is executed.
+     * the statement within the DO is executed. Also, this method creates a recursive
+     * child environment in order to facilitate usage of local variables.
      * 
      * @param env the environment within which operations are occuring
      * @precondition The condition and statements are executeable
-     * @postcondition The proper statements are executed
+     * @postcondition The proper statements are executed in the child environment
      **/
     public void exec(Environment env)
     {

@@ -32,8 +32,10 @@ import ast.ProcedureCallStmt;
  * 5. Perform block expressions delineated by BEGIN and END
  * 6. Perform IF statements
  * 7. Perform WHILE loops
+ * 8. Define Procedures
+ * 9. Execute Procedures
  * @author Rishab Parthasarathy
- * @version 3.25.2020
+ * @version 04.10.2020
  */
 public class Parser
 {
@@ -101,7 +103,7 @@ public class Parser
         return new Number(ret);
     }
     /**
-     * Method parseStatement tries to parse 4 types of commands:
+     * Method parseStatement tries to parse 7 types of commands:
      *     1. WRITELN commands with the format WRITELN(expr); where
      *        expr denotes an expression containing numbers, variables, 
      *        parentheses, and arithmetic operations. The WRITELN command
@@ -129,12 +131,16 @@ public class Parser
      *     6. WHILE loops of the format
      *        WHILE cond DO stmt. cond represents a boolean condition and stmt refers to a
      *        statement. While the condition is true, the statement is executed.
+     *     7. Procedure calls of the form id(params), where id is the name of the procedure
+     *        and params is a comma separated list of expressions of nonnegative length that
+     *        represents the parameters. With the given parameters, the statement within the
+     *        procedure is executed as well as possible.
      * 
-     * This method stores all of these 6 functionalities within nodes of the Abstract
+     * This method stores all of these 7 functionalities within nodes of the Abstract
      * Syntax Tree or AST. This allows the AST to simplify and evaluate everything
      * more efficiently after all of the parsing is done.
      * 
-     * @precondition The parser is currently observing a token that begins one of the 6
+     * @precondition The parser is currently observing a token that begins one of the 7
      *               command types described above
      * @postcondition The command has been transformed to part of an AST andthe parser has 
      *                eaten/parsed the entirety of the command
@@ -227,7 +233,7 @@ public class Parser
         return ret;
     }
     /**
-     * Method parseFactor parses four types of factors (simplest form of an expression):
+     * Method parseFactor parses five types of factors (simplest form of an expression):
      *     1. A factor of the form (expr), where expr denotes an expression containing 
      *        numbers, variables, parentheses, and arithmetic operations. This type of
      *        factor simply has the value of the expression.
@@ -238,8 +244,13 @@ public class Parser
      *        variable. The value of this factor is just the value stored within the variable.
      *     4. A factor of the form num, where num is an integer. The value of this factor is
      *        just the number, which is computed using the method parseNumber().
+     *     5. Procedure calls of the form id(params), where id is the name of the procedure
+     *        and params is a comma separated list of expressions of nonnegative length that
+     *        represents the parameters. With the given parameters, the statement within the
+     *        procedure is executed and the value of this factor is the return value of the
+     *        procedure.
      * 
-     * @precondition The parser is currently observing a token that begins one of the 4
+     * @precondition The parser is currently observing a token that begins one of the 5
      *               factor types described above
      * @postcondition The factor has been properly transformed to an AST component and the parser 
      *                has eaten/parsed the entirety of the factor
@@ -398,6 +409,19 @@ public class Parser
         Expression exp2 = parseExpression();
         return new Condition(operator, exp1, exp2);
     }
+    /**
+     * Method parseProgram parses the whole program from top to bottom. The program starts
+     * with some number of procedure declarations of the form PROCEDURE id(params); stmt, where
+     * id is the procedure name, params is a list of parameters of nonnegative length, and stmt
+     * is the statement to be evaluated when the procedure is called. Then, the program parses
+     * a singular statement and stores all of the above information in an AST wrapper.
+     * 
+     * @precondition the program follows the format of multiple procedure declarations followed
+     *               by one statement
+     * @postcondition the program is properly parsed fully
+     * @return An AST node/wrapper encapsulating all the procedure declarations and the final
+     *         statement.
+     */
     public Program parseProgram()
     {
         List<ProcedureDeclaration> ls = new ArrayList<>();

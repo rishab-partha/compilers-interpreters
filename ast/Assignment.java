@@ -25,11 +25,12 @@ public class Assignment extends Statement
     }
     /**
      * Method exec assigns the variable to the value of the expression within the environment
-     * that the operations are occuring within. 
+     * where the variable is stored. 
      *
-     * @param env the environment within which operations are occuring
+     * @param env the environment within which the variable is stored
      * @precondition The expression is evaluatable
      * @postcondition The value of the variable has been assigned to the value of the expression
+     *                in the correct environment
      */
     public void exec(Environment env)
     {
