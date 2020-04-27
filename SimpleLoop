@@ -1,0 +1,27 @@
+.data
+.text 0x00400000
+.globl main
+
+	
+main:
+	li $t0, 1                 # Load 1 to $t0
+	j looptest		  # Jump to the code at looptest
+
+looptest:
+	bgt $t0, 10, end          # Checks whether $t0 > 10
+		li $v0, 1         # Load 1 to $v0
+		move $a0, $t0     # Move the value of $t0 to $a0
+		syscall           # Print the value of $a0
+		li $v0, 4         # Load 4 to $v0
+		la $a0, msg	  # Load the newline to $a0
+		syscall           # Print the newline
+		addi $t0, $t0, 1  # Increment $t0 by 1
+	j looptest                # While the code runs, repeat the loop
+
+end:
+	li $v0, 10                # Load 10 to $v0
+	syscall                   # Exit from the program
+	
+	.data
+msg:
+	.asciiz "\n"
