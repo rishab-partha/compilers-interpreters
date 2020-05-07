@@ -1,5 +1,6 @@
 package ast;
 import environment.Environment;
+import emitter.Emitter;
 /**
  * The While class encodes a while loop of the form
  * WHILE cond DO stmt. Starting from the first iteration,
@@ -40,5 +41,14 @@ public class While extends Statement
         {
             s.exec(env1);
         }
+    }
+    public void compile(Emitter e)
+    {
+        int i = e.nextLabelID();
+        e.emit("while" + i + ":");
+        c.compile(e, "endif" + i);
+        s.compile(e);
+        e.emit("j while" + i);
+        e.emit("endif" + i + ":");
     }
 }

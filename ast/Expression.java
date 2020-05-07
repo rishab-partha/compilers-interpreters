@@ -1,5 +1,7 @@
 package ast;
 import environment.Environment;
+import emitter.Emitter;
+import java.lang.RuntimeException;
 /**
  * The class Expression is the abstract base for all
  * numerical and logical expressions that require evaluation.
@@ -20,4 +22,9 @@ public abstract class Expression
      * @return the value of the operation, which is 0 or 1 for boolean values
      */
     public abstract int eval(Environment env);
+
+    public void compile(Emitter e)
+    {
+        throw new RuntimeException("Implement Me!");
+    }
 }

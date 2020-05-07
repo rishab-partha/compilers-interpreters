@@ -1,6 +1,7 @@
 package ast;
 import environment.Environment;
 import java.util.*;
+import emitter.Emitter;
 /**
  * Program serves as essentially the wrapper for the whole Abstract Syntax Tree (AST).
  * Program stores a list of ProcedureDeclarations and then a statement because the format
@@ -11,6 +12,7 @@ import java.util.*;
  */
 public class Program 
 {
+    private List<String> variables;
     private List<ProcedureDeclaration> pds;
     private Statement st;
     /**
@@ -21,8 +23,9 @@ public class Program
      * @param ls The list of procedures stored as ProcedureDeclarations
      * @param s The statement occuring at the end
      */
-    public Program(List<ProcedureDeclaration> ls, Statement s)
+    public Program(List<String> vars, List<ProcedureDeclaration> ls, Statement s)
     {
+        variables = vars;
         pds = ls;
         st = s;
     }
@@ -41,5 +44,22 @@ public class Program
             pd.exec(env);
         }
         st.exec(env);
+    }
+    public void compile(Emitter e)
+    {
+        e.emit(".data");
+        e.emit("newline:");
+        e.emit(".asciiz \"\\n\"");
+        for (String s: variables)
+        {
+            e.emit("var" + s + ":");
+            e.emit(".word 0");
+        }
+        e.emit(".text 0x00400000");
+        e.emit(".globl main");
+        e.emit("main:");
+        st.compile(e);
+        e.emit("li $v0, 10");
+        e.emit("syscall");
     }
 }

@@ -424,6 +424,20 @@ public class Parser
      */
     public Program parseProgram()
     {
+        List<String> vars = new ArrayList<>();
+        if (curToken.equals("VAR"))
+        {
+            eat("VAR");
+            vars.add(curToken);
+            eat(curToken);
+            while(curToken.equals(","))
+            {
+                eat(",");
+                vars.add(curToken);
+                eat(curToken);
+            }
+            eat(";");
+        }
         List<ProcedureDeclaration> ls = new ArrayList<>();
         while (curToken.equals("PROCEDURE"))
         {
@@ -449,6 +463,6 @@ public class Parser
             ls.add(new ProcedureDeclaration(s, st, params));
         }
         Statement st = parseStatement();
-        return new Program(ls, st);
+        return new Program(vars, ls, st);
     }
 }

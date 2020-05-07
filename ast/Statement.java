@@ -1,5 +1,7 @@
 package ast;
 import environment.Environment;
+import emitter.Emitter;
+import java.lang.RuntimeException;
 /**
  * The abstract class Statement is the base for all commands 
  * and statements within the AST. These can include Writing to
@@ -17,4 +19,9 @@ public abstract class Statement
      * @param env the environment within which operations are occuring
      */
     public abstract void exec(Environment env);
+    
+    public void compile(Emitter e)
+    {
+        throw new RuntimeException("Implement Me!");
+    }
 }

@@ -1,6 +1,7 @@
 package ast;
 import java.util.List;
 import environment.Environment;
+import emitter.Emitter;
 /**
  * The Block class encodes a statement enclosed by BEGIN
  * and END that serves to compact multiple statements into
@@ -34,6 +35,13 @@ public class Block extends Statement
         for (Statement s : sts)
         {
             s.exec(env);
+        }
+    }
+    public void compile(Emitter e)
+    {
+        for (Statement s: sts)
+        {
+            s.compile(e);
         }
     }
 }

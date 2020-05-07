@@ -2,6 +2,7 @@ import java.io.*;
 import scanner.*;
 import parser.*;
 import environment.*;
+import emitter.Emitter;
 /**
  * This Main class is responsible for testing the scanner by
  * choosing a source document and forcing the scanner to parse it.
@@ -23,10 +24,11 @@ public class Main
      */
     public static void main(String[] args) throws IOException
     {
-        BufferedReader in = new BufferedReader(new FileReader("parser//parsertest7.txt"));
+        BufferedReader in = new BufferedReader(new FileReader("parser//parsertest10.txt"));
         Scanner sc = new Scanner(in);
         Parser p = new Parser(sc);
         Environment env = new Environment(null);
-        p.parseProgram().exec(env);
+        Emitter e = new Emitter("output.asm");
+        p.parseProgram().compile(e);
     }   
 }

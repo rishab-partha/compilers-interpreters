@@ -1,5 +1,6 @@
 package ast;
 import environment.Environment;
+import emitter.Emitter;
 /**
  * Class Variable represents an expression that has its value
  * stored within the environment. The class merely stores the 
@@ -33,5 +34,10 @@ public class Variable extends Expression
     public int eval(Environment env)
     {
         return env.getVariable(varName);
+    }
+    public void compile(Emitter e)
+    {
+        e.emit("la $t0, var" + varName);
+        e.emit("lw $v0, ($t0)");
     }
 }

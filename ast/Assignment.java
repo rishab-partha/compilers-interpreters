@@ -1,5 +1,6 @@
 package ast;
 import environment.Environment;
+import emitter.Emitter;
 /**
  * The Assignment class encodes a type of statement
  * where a String variable name is associated with the value of 
@@ -35,5 +36,12 @@ public class Assignment extends Statement
     public void exec(Environment env)
     {
         env.setVariable(var, exp.eval(env));
+    }
+
+    public void compile(Emitter e)
+    {
+        exp.compile(e);
+        e.emit("la $t0, var" + var);
+        e.emit("sw $v0, ($t0)");
     }
 }

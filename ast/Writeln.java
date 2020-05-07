@@ -1,5 +1,6 @@
 package ast;
 import environment.Environment;
+import emitter.Emitter;
 /**
  * Class Writeln denotes a statement that prints the value of
  * an expression if the expression is contained within the 
@@ -31,5 +32,14 @@ public class Writeln extends Statement
     public void exec(Environment env)
     {
         System.out.println(exp.eval(env));
+    }
+
+    public void compile(Emitter e)
+    {
+        exp.compile(e);
+        e.emit("move $a0, $v0");
+        e.emit("li $v0, 1");
+        e.emit("syscall");
+        e.newline();
     }
 }

@@ -1,5 +1,6 @@
 package ast;
 import environment.Environment;
+import emitter.Emitter;
 /**
  * The Number Class represents the simplest expression, which
  * is just an integer by itself.
@@ -27,5 +28,9 @@ public class Number extends Expression
     public int eval(Environment env)
     {
         return val;
+    }
+    public void compile(Emitter e)
+    {
+        e.emit("li $v0, " + val);
     }
 }

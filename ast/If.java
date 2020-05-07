@@ -1,5 +1,6 @@
 package ast;
 import environment.Environment;
+import emitter.Emitter;
 /**
  * The If class encodes an if statement of the form
  * IF cond THEN stmt (ELSE stmt) where the else statement is optional.
@@ -50,6 +51,17 @@ public class If extends Statement
         else if (s2 != null)
         {
             s2.exec(env1);
+        }
+    }
+    public void compile(Emitter e)
+    {
+        int i = e.nextLabelID();
+        c.compile(e, "endif" + i);
+        s1.compile(e);
+        e.emit("endif" + i + ":");
+        if (s2 != null)
+        {
+            s2.compile(e);
         }
     }
 }

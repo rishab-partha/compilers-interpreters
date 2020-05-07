@@ -1,5 +1,6 @@
 package ast;
 import environment.Environment;
+import emitter.Emitter;
 /**
  * The BinOp class encodes a type of expression
  * where two Expressions are separated by a binary operator,
@@ -69,5 +70,38 @@ public class BinOp extends Expression
             throw new IllegalArgumentException("Operator " + operator + " not recognized.");
         }
         return ret;
+    }
+    public void compile(Emitter e)
+    {
+        e1.compile(e);
+        e.push("v0");
+        e2.compile(e);
+        e.pop("t0");
+        if (operator.equals("+"))
+        {
+            e.emit("addu $v0, $t0, $v0");
+        }
+        else if (operator.equals("-"))
+        {
+            e.emit("subu $v0, $t0, $v0");
+        }
+        else if (operator.equals("*"))
+        {
+            e.emit("mul $v0, $t0, $v0");
+        }
+        else if (operator.equals("/"))
+        {
+            e.emit("div $v0, $t0, $v0");
+        }
+        else if (operator.equals("%"))
+        {
+            e.emit("div $t1, $t0, $v0");
+            e.emit("mul $v0, $v0, $t1");
+            e.emit("sub $v0, $t0, $v0");
+        }
+        else
+        {
+            throw new IllegalArgumentException("Operator " + operator + " not recognized.");
+        }
     }
 }

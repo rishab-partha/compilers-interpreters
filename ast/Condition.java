@@ -1,5 +1,6 @@
 package ast;
 import environment.Environment;
+import emitter.Emitter;
 /**
  * The Condition class encodes a type of expression
  * where two Expressions are separated by a relational operator,
@@ -96,5 +97,40 @@ public class Condition extends Expression
             throw new IllegalArgumentException("Operator " + operator + " not recognized.");
         }
         return ret;
+    }
+    public void compile(Emitter e, String targlabel)
+    {
+        e1.compile(e);
+        e.push("v0");
+        e2.compile(e);
+        e.pop("t0");
+        if (operator.equals("="))
+        {
+            e.emit("bne $t0, $v0, " + targlabel);
+        }
+        else if (operator.equals("<>"))
+        {
+            e.emit("beq $t0, $v0, " + targlabel);
+        }
+        else if (operator.equals("<"))
+        {
+            e.emit("bge $t0, $v0, " + targlabel);
+        }
+        else if (operator.equals(">"))
+        {
+            e.emit("ble $t0, $v0, " + targlabel);
+        }
+        else if (operator.equals("<="))
+        {
+            e.emit("bgt $t0, $v0, " + targlabel);
+        }
+        else if (operator.equals(">="))
+        {
+            e.emit("blt $t0, $v0, " + targlabel);
+        }
+        else
+        {
+            throw new IllegalArgumentException("Operator " + operator + " not recognized.");
+        }
     }
 }
