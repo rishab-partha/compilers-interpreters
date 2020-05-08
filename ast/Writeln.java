@@ -6,7 +6,7 @@ import emitter.Emitter;
  * an expression if the expression is contained within the 
  * command WRITELN.
  * @author Rishab Parthasarathy
- * @version 03.25.2020
+ * @version 05.08.2020
  */
 public class Writeln extends Statement
 {
@@ -34,11 +34,20 @@ public class Writeln extends Statement
         System.out.println(exp.eval(env));
     }
 
+    /**
+     * Method compile converts the WRITELN statement to MIPS code. First, it emits code
+     * compiling the expression before emitting code that moves the value into an
+     * argument register. Then, code is emitted that prepares for integer printing and that
+     * prints the integer.
+     * 
+     * @param e The Emitter that emits the MIPS code
+     * @postcondition The Full WRITELN statement code has been emitted
+     */
     public void compile(Emitter e)
     {
-        exp.compile(e);
-        e.emit("move $a0, $v0");
-        e.emit("li $v0, 1");
+        exp.compile(e); 
+        e.emit("move $a0, $v0 #Move value into argument register");
+        e.emit("li $v0, 1 #Prepare for printing");
         e.emit("syscall");
         e.newline();
     }

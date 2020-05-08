@@ -9,7 +9,7 @@ import java.lang.RuntimeException;
  * all comparative operators along with parentheses and negative
  * signs.
  * @author Rishab Parthasarathy
- * @version 03.25.2020
+ * @version 05.07.2020
  */
 public abstract class Expression
 {
@@ -23,6 +23,14 @@ public abstract class Expression
      */
     public abstract int eval(Environment env);
 
+    /**
+     * Method compile provides a base for the methodology that will output
+     * MIPS Assembly code for all Expressions. The method has a RuntimeException
+     * so that if compile is called for a class without compile implemented, an
+     * exception is thrown.
+     * 
+     * @param e The Emitter that emits the MIPS code
+     */
     public void compile(Emitter e)
     {
         throw new RuntimeException("Implement Me!");

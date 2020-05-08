@@ -6,7 +6,7 @@ import emitter.Emitter;
  * where a String variable name is associated with the value of 
  * an expression within the given environment.
  * @author Rishab Parthasarathy
- * @version 03.25.2020
+ * @version 05.07.2020
  */
 public class Assignment extends Statement
 {
@@ -38,10 +38,17 @@ public class Assignment extends Statement
         env.setVariable(var, exp.eval(env));
     }
 
+    /**
+     * Method compile translates the assignment operation into MIPS code. First, it translates the
+     * expression into MIPS with its value in $v0 and then loads the value into the variable.
+     * 
+     * @param e The Emitter emitting the information
+     * @postcondition The assignment operation has been translated to MIPS
+     */
     public void compile(Emitter e)
     {
         exp.compile(e);
         e.emit("la $t0, var" + var);
-        e.emit("sw $v0, ($t0)");
+        e.emit("sw $v0, ($t0) #set variable " + var + " to $v0");
     }
 }

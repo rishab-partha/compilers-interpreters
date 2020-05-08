@@ -8,7 +8,7 @@ import java.lang.RuntimeException;
  * the Console, Executing Assignment Commands, and Performing
  * If Statements and While Loops.
  * @author Rishab Parthasarathy
- * @version 03.25.2020
+ * @version 05.07.2020
  */
 public abstract class Statement
 {
@@ -20,6 +20,14 @@ public abstract class Statement
      */
     public abstract void exec(Environment env);
     
+    /**
+     * Method compile provides a base for the methodology that will output
+     * MIPS Assembly code for all Statements. The method has a RuntimeException
+     * so that if compile is called for a class without compile implemented, an
+     * exception is thrown.
+     * 
+     * @param e The Emitter that emits the MIPS code
+     */
     public void compile(Emitter e)
     {
         throw new RuntimeException("Implement Me!");

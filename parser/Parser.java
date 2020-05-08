@@ -34,8 +34,9 @@ import ast.ProcedureCallStmt;
  * 7. Perform WHILE loops
  * 8. Define Procedures
  * 9. Execute Procedures
+ * 10.Define Global Variables using VAR before anything else.
  * @author Rishab Parthasarathy
- * @version 04.10.2020
+ * @version 05.07.2020
  */
 public class Parser
 {
@@ -410,8 +411,10 @@ public class Parser
         return new Condition(operator, exp1, exp2);
     }
     /**
-     * Method parseProgram parses the whole program from top to bottom. The program starts
-     * with some number of procedure declarations of the form PROCEDURE id(params); stmt, where
+     * Method parseProgram parses the whole program from top to bottom. The program starts with
+     * some number of VAR var1, ... , varn; where var1 to varn are global variables. If there are
+     * no global variables, there is no VAR statement. Then, the program parses
+     * some number of procedure declarations of the form PROCEDURE id(params); stmt, where
      * id is the procedure name, params is a list of parameters of nonnegative length, and stmt
      * is the statement to be evaluated when the procedure is called. Then, the program parses
      * a singular statement and stores all of the above information in an AST wrapper.
@@ -425,7 +428,7 @@ public class Parser
     public Program parseProgram()
     {
         List<String> vars = new ArrayList<>();
-        if (curToken.equals("VAR"))
+        while (curToken.equals("VAR"))
         {
             eat("VAR");
             vars.add(curToken);

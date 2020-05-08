@@ -6,7 +6,7 @@ import emitter.Emitter;
  * where two Expressions are separated by a binary operator,
  * which are addition, subtraction, multiplication, division, and modulus.
  * @author Rishab Parthasarathy
- * @version 03.25.2020
+ * @version 05.07.2020
  */
 public class BinOp extends Expression
 {
@@ -71,6 +71,16 @@ public class BinOp extends Expression
         }
         return ret;
     }
+
+    /**
+     * Method compile compiles the Binary Operation by first compiling the operation on the left.
+     * Then, the value is pushed onto the stack, and the operation on the right is compiled. Then,
+     * the value of the left operation is popped off the stack and the value of the operation,
+     * which can be either +, -, *, /, or %, is put into $v0.
+     * 
+     * @param e The Emitter that emits the MIPS code
+     * @postcondition The MIPS code for the binop is emitted and will store the value in $v0
+     */
     public void compile(Emitter e)
     {
         e1.compile(e);
@@ -103,5 +113,6 @@ public class BinOp extends Expression
         {
             throw new IllegalArgumentException("Operator " + operator + " not recognized.");
         }
+        e.emit("#Binary operation complete");
     }
 }

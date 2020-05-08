@@ -5,7 +5,7 @@ import emitter.Emitter;
  * The Number Class represents the simplest expression, which
  * is just an integer by itself.
  * @author Rishab Parthasarathy
- * @version 03.25.2020
+ * @version 05.07.2020
  */
 public class Number extends Expression
 {
@@ -29,8 +29,15 @@ public class Number extends Expression
     {
         return val;
     }
+
+    /**
+     * Method compile writes the MIPS code that loads the integer number into address $v0.
+     * 
+     * @param e The Emitter that emits the MIPS code
+     * @postcondition MIPS code for loading the value into $v0 is complete.
+     */
     public void compile(Emitter e)
     {
-        e.emit("li $v0, " + val);
+        e.emit("li $v0, " + val + " #Set $v0 to a value");
     }
 }

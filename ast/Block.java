@@ -7,7 +7,7 @@ import emitter.Emitter;
  * and END that serves to compact multiple statements into
  * one statement, or block of statements.
  * @author Rishab Parthasarathy
- * @version 03.25.2020
+ * @version 05.07.2020
  */
 public class Block extends Statement
 {
@@ -37,6 +37,13 @@ public class Block extends Statement
             s.exec(env);
         }
     }
+    /**
+     * Method compile compiles the Block Statement by compiling all the statements within
+     * the block sequentially
+     * 
+     * @param e The Emitter that emits the MIPS code
+     * @postcondition The MIPS code for the Block command is emitted
+     */
     public void compile(Emitter e)
     {
         for (Statement s: sts)

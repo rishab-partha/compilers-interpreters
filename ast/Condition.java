@@ -9,7 +9,7 @@ import emitter.Emitter;
  * facilitate use as an Expression, which has an integer value, the 
  * Condition class outputs boolean values as 0s and 1s.
  * @author Rishab Parthasarathy
- * @version 03.25.2020
+ * @version 05.07.2020
  */
 public class Condition extends Expression
 {
@@ -98,6 +98,18 @@ public class Condition extends Expression
         }
         return ret;
     }
+    
+    /**
+     * Method compile compiles the Binary Operation by first compiling the operation on the left.
+     * Then, the value is pushed onto the stack, and the operation on the right is compiled. Then,
+     * the value of the left operation is popped off the stack. Based on the operator, the MIPS
+     * condition is either bne for =, beq for <>, bge for <, bgt for <=, ble for >, or blt for >=.
+     * Then, the comparison is emitted with a target label as the jump address.
+     * 
+     * @param e The Emitter that emits the MIPS code
+     * @param targlabel The label to jump to if the condition is false
+     * @postcondition The MIPS code for the condition is outputted and will accurately execute it.
+     */
     public void compile(Emitter e, String targlabel)
     {
         e1.compile(e);
@@ -132,5 +144,6 @@ public class Condition extends Expression
         {
             throw new IllegalArgumentException("Operator " + operator + " not recognized.");
         }
+        e.emit("#Condition for an if statement or while loop");
     }
 }

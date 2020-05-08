@@ -8,7 +8,7 @@ import emitter.Emitter;
  * and if the condition is false and the else exists, the statement within
  * the else is executed.
  * @author Rishab Parthasarathy
- * @version 04.10.2020
+ * @version 05.08.2020
  */
 public class If extends Statement
 {
@@ -53,12 +53,23 @@ public class If extends Statement
             s2.exec(env1);
         }
     }
+    /**
+     * Method compile converts the if statement into MIPS. It first does this by using the
+     * Emitter to generate a unique ID for the if statement. Then, the condition is 
+     * compiled with a jump statement and the then statement is compiled. After that, the
+     * jump statement is written and the possible else statement is written under the jump
+     * label.
+     * 
+     * @param e The Emitter that emits the MIPS code
+     * @postcondition The Full IF statement code has been emitted with unique jump labels
+     */
     public void compile(Emitter e)
     {
         int i = e.nextLabelID();
         c.compile(e, "endif" + i);
         s1.compile(e);
         e.emit("endif" + i + ":");
+        e.emit("#jump statement for the " + i + "th if");
         if (s2 != null)
         {
             s2.compile(e);

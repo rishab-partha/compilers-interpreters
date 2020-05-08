@@ -7,7 +7,7 @@ import emitter.Emitter;
  * the condition is tested, and while the condition remains true,
  * the statement within the do is executed.
  * @author Rishab Parthasarathy
- * @version 04.10.2020
+ * @version 05.08.2020
  */
 public class While extends Statement
 {
@@ -42,13 +42,25 @@ public class While extends Statement
             s.exec(env1);
         }
     }
+    /**
+     * Method compile converts the while loop into MIPS. It first does this by using the
+     * Emitter to generate a unique ID for the while loop. Then, a while label is defined
+     * and the condition is compiled. Then, the DO statement is compiled under the
+     * condition and a jump back to the beginning of the while loop is emitted at the end
+     * of the while label. Finally, a ending label for the while loop is emitted that is empty.
+     * 
+     * @param e The Emitter that emits the MIPS code
+     * @postcondition The Full while loop code has been emitted with unique jump labels
+     */
     public void compile(Emitter e)
     {
         int i = e.nextLabelID();
         e.emit("while" + i + ":");
-        c.compile(e, "endif" + i);
+        e.emit("#jump statement for the " + i + "th while");
+        c.compile(e, "endwhile" + i);
         s.compile(e);
-        e.emit("j while" + i);
-        e.emit("endif" + i + ":");
+        e.emit("j while" + i + " #loop to the beginning of the while");
+        e.emit("endwhile" + i + ":");
+        e.emit("#empty end of the while loop");
     }
 }

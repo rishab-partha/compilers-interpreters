@@ -8,7 +8,7 @@ import emitter.Emitter;
  * of a PASCAL program is procedures, and then one statement. 
  * 
  * @author Rishab Parthasarathy
- * @version 04.10.2020
+ * @version 05.08.2020
  */
 public class Program 
 {
@@ -45,21 +45,33 @@ public class Program
         }
         st.exec(env);
     }
+    /**
+     * Method compile converts the program into MIPS. First, it emits a .data section, which
+     * contains a newline character for printing and variables with unique names based on the
+     * variables designated by the program. In the .data section, all variables are initialized
+     * to 0. Then, it emits a .text 0x00400000 and .globl main statements before the main: label.
+     * After the main label, the program compiles the statement and then emits code for the
+     * program to end.
+     * 
+     * @param e The Emitter that emits the MIPS code
+     * @postcondition The Full program code has been emitted properly
+     */
     public void compile(Emitter e)
     {
         e.emit(".data");
-        e.emit("newline:");
+        e.emit("newline: #Define a newline character");
         e.emit(".asciiz \"\\n\"");
         for (String s: variables)
         {
-            e.emit("var" + s + ":");
+            e.emit("var" + s + ": #Define a new variable and initialize to 0");
             e.emit(".word 0");
         }
         e.emit(".text 0x00400000");
         e.emit(".globl main");
         e.emit("main:");
+        e.emit("#main procedure");
         st.compile(e);
-        e.emit("li $v0, 10");
+        e.emit("li $v0, 10 #End program");
         e.emit("syscall");
     }
 }
