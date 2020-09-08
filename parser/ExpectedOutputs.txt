@@ -1,0 +1,3 @@
+The code will read in 3 numbers.
+Then, it will print the minimum first on a new line.
+Finally, it will print the maximum on a new line.

@@ -1,15 +1,19 @@
 package ast;
 import environment.Environment;
 import java.util.*;
+import emitter.Emitter;
 /**
  * ProcedureCall defines a call to a previously defined procedure in the form
  * of an expression of the form: id(params). In this case, id is the name of
  * the procedure and params is the comma separated list of inputs, which can
  * be expressions. ProcedureCall looks to the environment and matches up parameters
  * before creating child environments and executes the procedure, calculating return
- * values along the way.
+ * values along the way. To compile a procedure call, it writes MIPS code to push
+ * the parameter values to the stack before calling the procedure. Once the procedure
+ * is done running, it notifies the emitter that all vars have been cleared off the stack.
+ * 
  * @author Rishab Parthasarathy
- * @version 04.10.2020
+ * @version 05.21.2020
  */
 public class ProcedureCall extends Expression
 {
@@ -63,5 +67,27 @@ public class ProcedureCall extends Expression
         Statement st = dec.getStatement();
         st.exec(env1);
         return env1.getVariable(name);
+    }
+    /**
+     * Method compile compiles a procedure call by first saving the current excess stack
+     * height. Then, it calculates the values of the parameters and pushes them to the
+     * stack. Afterwards, the method emits a jump and link to the procedure. Finally, the
+     * procedure restores the stack height to what it was before the procedure call.
+     * 
+     * @param e The Emitter that emits the MIPS code
+     * @postcondition The procedure has been properly called in MIPS, and the stack has been
+     *                restored to its pre-call state.
+     */
+    public void compile(Emitter e)
+    {
+        e.saveStackHeight();
+        for (Expression exp: exps)
+        {
+            exp.compile(e);
+            e.push("v0");
+            e.emit("#push parameter");
+        }
+        e.emit("jal proc" + name);
+        e.restoreStackHeight();
     }
 }

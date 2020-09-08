@@ -1,13 +1,11 @@
+VAR x, y, ignore;
 PROCEDURE Add(y,w,z);
 BEGIN
 	WRITELN(y);
 	WRITELN(w);
 	WRITELN(z);
 	x := x + y;
-	Bar();
 END;
-PROCEDURE Bar();
-WRITELN(w);
 
 BEGIN
 	x := 2;
@@ -26,7 +24,7 @@ BEGIN
 		x := x + 1;
 	END;
 	WRITELN(y);
-	Add(4,x,y);
+	ignore := Add(4,x,y);
 	WRITELN(x);
 	
 END;

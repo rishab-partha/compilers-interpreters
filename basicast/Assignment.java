@@ -1,12 +1,11 @@
-package ast;
-import environment.Environment;
-import emitter.Emitter;
+package basicast;
+import basicenv.Environment;
 /**
  * The Assignment class encodes a type of statement
  * where a String variable name is associated with the value of 
  * an expression within the given environment.
  * @author Rishab Parthasarathy
- * @version 05.21.2020
+ * @version 05.27.2020
  */
 public class Assignment extends Statement
 {
@@ -37,27 +36,20 @@ public class Assignment extends Statement
     {
         env.setVariable(var, exp.eval(env));
     }
-
     /**
-     * Method compile translates the assignment operation into MIPS code. First, it translates the
-     * expression into MIPS with its value in $v0 and then loads the value into the variable. If 
-     * the variable is local, it loads the value onto the stack. Otherwise, the method loads the
-     * value into a label.
+     * Method list prints out the assignment statement in the format:
      * 
-     * @param e The Emitter emitting the information
-     * @postcondition The assignment operation has been translated to MIPS
+     *      LET var = exp
+     * 
+     * where var is the variable name and exp is the expression.
+     * 
+     * @postcondition the assignment statement has been printed to standard output with the above
+     *                formatting
      */
-    public void compile(Emitter e)
+    public void list()
     {
-        exp.compile(e);
-        if (e.isLocalVariable(var))
-        {
-            e.emit("sw $v0, " + e.getOffset(var) + "($sp) # set variable " + var + " on the stack");
-        }
-        else
-        {
-            e.emit("la $t0, var" + var);
-            e.emit("sw $v0, ($t0) #set variable " + var + " to $v0");
-        }
+        System.out.print("LET " + var + " = ");
+        exp.list();
+        System.out.println();
     }
 }

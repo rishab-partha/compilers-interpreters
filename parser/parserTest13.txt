@@ -1,0 +1,11 @@
+VAR x, ignore;
+PROCEDURE countUp(count, max);
+   IF count <= max THEN
+   BEGIN
+     WRITELN(count);
+     ignore := countUp(count + 1, max);
+     WRITELN(3*4*5*6);
+   END;
+   
+x := countUp(2, 4);
+   .

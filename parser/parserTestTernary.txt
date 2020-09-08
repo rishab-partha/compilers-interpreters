@@ -1,0 +1,10 @@
+VAR x, y, z, min, max;
+BEGIN
+    READLN(x);
+    READLN(y);
+    READLN(z);
+    min := ? x > y : ? y > z : z : y : ? x > z : z : x;
+    max := ? x > y : ? x > z : x : z : ? z > y : z : y;
+    WRITELN(min);
+    WRITELN(max);
+END;

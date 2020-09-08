@@ -1,4 +1,4 @@
-package scanner;
+package basicscanner;
 import java.io.*;
 
 /**
@@ -12,6 +12,7 @@ import java.io.*;
  *  3. An operand such as multiplication. This includes multicharacter operands like
  *     += or !=.
  *  4. A delimiter such as a semicolon.
+ *  5. A newline for use in finding line ends in BASIC
  * @author Mr. Page
  * @author Rishab Parthasarathy
  * @version 5.27.2020
@@ -23,6 +24,7 @@ public class Scanner
     private Reader in;
     private char currentChar; 
     private boolean endOfFile;
+    private boolean seenNewLine;
 
     /**
      * Constructor for Scanner objects.  The Reader object should be one of
@@ -32,7 +34,8 @@ public class Scanner
      *  The instance field for the Reader is initialized to the input parameter,
      *  and the endOfFile indicator is set to false.  The currentChar field is
      *  initialized by the getNextChar method. This enables the look ahead process 
-     *  by initializing the character being looked at one ahead. 
+     *  by initializing the character being looked at one ahead. The seenNewLine
+     *  indicator for whether the last character was a newline is set to false.
      * @param in is the reader object supplied by the program constructing
      *        this Scanner object.
      * @postcondition the reader is at the first character of the document provided by
@@ -43,6 +46,7 @@ public class Scanner
         this.in = in;
         endOfFile = false;
         getNextChar();
+        seenNewLine = false;
     }
 
     /**
@@ -50,7 +54,8 @@ public class Scanner
      *  The instance field for the Reader is initialized to the input parameter,
      *  and the endOfFile indicator is set to false.  The currentChar field is
      *  initialized by the getNextChar method. This enables the look ahead process 
-     *  by initializing the character being looked at one ahead. 
+     *  by initializing the character being looked at one ahead. The seenNewLine
+     *  indicator for whether the last character was a newline is set to false.
      *  @param in is the input stream object supplied by the program constructing
      *        this Scanner object.
      *  @postcondition the input stream is at the first character of the document provided by
@@ -60,6 +65,7 @@ public class Scanner
     {
         this.in = new BufferedReader(new InputStreamReader(inStream));
         endOfFile = false;
+        seenNewLine = false;
         getNextChar();
     }
 
@@ -145,7 +151,7 @@ public class Scanner
     }
 
     /**
-     * Checks whether a given character is white space
+     * Checks whether a given character is white space not including newline
      * using the ascii value of the characer.
      *
      * @param s one character.
@@ -154,7 +160,7 @@ public class Scanner
      */
     public static boolean isWhiteSpace(char s)
     {
-        return s == ' ' || s == '\t' || s == '\n' || s == '\r';
+        return s == ' ' || s == '\t' || s == '\r';
     }
     /**
      * Checks whether a given character is a delimiter using 
@@ -167,7 +173,7 @@ public class Scanner
     public static boolean isDelimiter(char s)
     {
         return s == ';' || s == '(' || s == ')' || s == '{' || s == '}' || s == '[' 
-            || s == ']' || s == ',' || s == '?' || s == ':'; 
+            || s == ']' || s == ','; 
     }
     /**
      * Checks whether a given character is an operator using 
@@ -197,7 +203,8 @@ public class Scanner
     /**
      * Scans a number by iterating through the input stream. In this definition,
      * a number is a sequence of digits that is of positive length. The regular
-     * expression is (digit)(digit)*.
+     * expression is (digit)(digit)*. scanNumber also sets the seenNewLine flag
+     * to false.
      * 
      * @return the number parsed by the Scanner
      * @precondition the current character is a digit
@@ -208,6 +215,7 @@ public class Scanner
      */
     private String scanNumber() throws ScanErrorException
     {
+        seenNewLine = false;
         String ret = "";
         if (isDigit(currentChar))
         {
@@ -243,6 +251,7 @@ public class Scanner
      * Scans an identifier by iterating through the input stream. In this definition,
      * an identifier is a letter followed by a sequence of letters and digits
      * that is of nonnegative length. The regular expression is (letter)(digit | letter)*.
+     * scanIdentifier also sets the seenNewLine flag to false.
      * 
      * @return the identifier parsed by the Scanner
      * @precondition the current character is a letter
@@ -253,6 +262,7 @@ public class Scanner
      */
     private String scanIdentifier() throws ScanErrorException
     {
+        seenNewLine = false;
         String ret = "";
         if (isLetter(currentChar))
         {
@@ -287,7 +297,8 @@ public class Scanner
     /**
      * Scans an operand by iterating through the input stream. In this definition,
      * an operand is one of +, -, /, *, :, %, !, =, <, or > with or without an equals
-     * sign following it. The one other operand possible is <>.
+     * sign following it. The one other operand possible is <>. scanOperand also sets the 
+     * seenNewLine flag to false.
      * 
      * @return the operand parsed by the Scanner
      * @precondition the current character is an operand
@@ -300,6 +311,7 @@ public class Scanner
      */
     private String scanOperand() throws ScanErrorException
     {
+        seenNewLine = false;
         String ret = "";
         if (isOperatorEqual(currentChar))
         {
@@ -337,8 +349,10 @@ public class Scanner
     }
     /**
      * Parses whitespace until the end of the file or the next non whitespace character.
+     * This whitespace does not include newlines.
      * 
-     * @postcondition the current character is either end of file or not whitespace
+     * @postcondition the current character is either end of file or not whitespace not including
+     *                newlines
      * @return true if the file has not ended, false otherwise
      * @throws ScanErrorException if the currentChar does not match up with the eat parameter
      */
@@ -356,7 +370,8 @@ public class Scanner
     }
     /**
      * Scans a delimiter by observing one character. In this definition,
-     * a delimiter is one of the characters ;, (, ), {, }, [, ], ?, or :.
+     * a delimiter is one of the characters ;, (, ), {, }, or [, ]. scanDelimiter also sets 
+     * the seenNewLine flag to false.
      * 
      * @return the delimiter parsed by the Scanner
      * @precondition the current character is a delimiter
@@ -368,6 +383,7 @@ public class Scanner
      */
     private String scanDelimiter() throws ScanErrorException
     {
+        seenNewLine = false;
         String ret = "";
         if (isDelimiter(currentChar))
         {
@@ -383,21 +399,6 @@ public class Scanner
         }
         return ret;
     }
-
-    /**
-     * Scans an inline comment until the end of a line.
-     * 
-     * @postcondition the end of the file or the end of a line is reached
-     * @throws ScanErrorException if there is a parsing error
-     */
-    private void scanInline() throws ScanErrorException
-    {
-        while ((currentChar != '\n') && (currentChar != '\r') && hasNext())
-        {
-            eat(currentChar);
-        }
-    }
-
     /**
      * Parses the next Token in the document. A token is defined as
      *  1. A word which is defined as a non-empty sequence of characters that 
@@ -407,12 +408,16 @@ public class Scanner
      *  3. An operand such as multiplication. This includes multicharacter operands like
      *     += or !=.
      *  4. A delimiter such as a semicolon.
+     *  5. A newline
      * First, nextToken eliminates all the whitespace. Then, nextToken looks at possible
      * comments based on the first character. After that, it eliminates each comment based
-     * on the type as inline or multiline. Then, nextToken parses the document using the eat method 
+     * on the type as inline or multiline. Then, nextToken parses the document using the eat method
      * and helper token reading methods while dividing the input into different types of tokens 
      * using the token identification helper methods. If a ScanErrorException is thrown, nextToken
-     * prints the error and exits from the system.
+     * prints the error and exits from the system. If the program sees a newline and the last 
+     * character was not a newline, the program does not scan further to allow the parsed statement
+     * to process before more input is needed. However, if both the current and last character are
+     * newlines, the method eats the newline and parses the next token to return.
      * 
      * @postcondition The program has either parsed and reached either the end of the token 
      *                or the end of file or crashed.
@@ -425,52 +430,7 @@ public class Scanner
             if (! parseWhiteSpace())
             {
                 return ".";
-            }
-            char cur = ' ';
-            while (currentChar == '/')
-            {
-                cur = currentChar;
-                eat(currentChar);
-                if (currentChar == '/')
-                {
-                    scanInline();
-                    if (hasNext())
-                    {
-                        eat(currentChar);
-                    }
-                }
-                else if (cur == '/' && currentChar == '*')
-                {
-                    while (!(cur == '*' && currentChar == '/') && hasNext())
-                    {
-                        cur = currentChar;
-                        eat(currentChar);
-                    }
-                    if (hasNext())
-                    {
-                        eat(currentChar);
-                    }
-                }
-                if (!parseWhiteSpace())
-                {
-                    return ".";
-                }
-            }
-            if (cur == '/')
-            {
-                if (currentChar == '=')
-                {
-                    if (hasNext())
-                    {
-                        eat(currentChar);
-                    }
-                    return "/=";
-                }
-                else
-                {
-                    return "/";
-                }
-            }
+            }            
             else if (isLetter(currentChar))
             {
                 return scanIdentifier();
@@ -487,8 +447,19 @@ public class Scanner
             {
                 return scanDelimiter();
             }
+            else if (currentChar == '\n' && !seenNewLine)
+            {
+                seenNewLine = true;
+                return "\n";
+            }
+            else if (currentChar == '\n')
+            {
+                eat('\n');
+                return nextToken();
+            }
             else if (currentChar == '.')
             {
+                seenNewLine = false;
                 endOfFile = true;
                 return ".";
             }

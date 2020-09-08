@@ -2,6 +2,7 @@ package environment;
 import ast.ProcedureDeclaration;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.Scanner;
 /**
  * The class Environment denotes the place where the variables and procedures
  * are stored. This allows variables and procedures to be handled independently
@@ -10,26 +11,29 @@ import java.util.HashMap;
  * variables, and the retrieval methods are also modeled around parent and child
  * environments.
  * @author Rishab Parthasarathy
- * @version 04.10.2020
+ * @version 05.21.2020
  */
 public class Environment
 {
     private Map<String, Integer> variables;
     private Map<String, ProcedureDeclaration> procedures;
-    Environment par;
+    private Environment par;
+    private Scanner scinput;
     /**
      * This constructor initializes the map of variables and procedures to be empty.
      * Also, the constructor initializes the parent environment, which is null if this
-     * is the global environment.
+     * is the global environment. Finally, this method initializes the Scanner to stdin.
      * 
      * @param p the parent environment
      * @postcondition the map of variables and procedures are initialized and empty
+     *                and the Scanner is initialized to stdin
      */
     public Environment(Environment p)
     {
         variables = new HashMap<>();
         procedures = new HashMap<>();
         par = p;
+        scinput = new Scanner(System.in);
     }
     /**
      * This method sets the value of a String variable identifier to a integer value
@@ -162,5 +166,14 @@ public class Environment
             return this;
         }
         return par.getPar();
+    }
+    /**
+     * Method getSc finds the Scanner for Readln to input values.
+     * 
+     * @return the stdin Scanner
+     */
+    public Scanner getSc()
+    {
+        return scinput;
     }
 }

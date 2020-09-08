@@ -8,7 +8,7 @@ import emitter.Emitter;
  * choosing a source document and forcing the scanner to parse and compile it.
  * 
  * @author Rishab Parthasarathy
- * @version 05.07.2020
+ * @version 05.21.2020
  */
 public class Main
 {

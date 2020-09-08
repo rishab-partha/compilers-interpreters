@@ -7,6 +7,7 @@ import emitter.Emitter;
  * If the condition is true, the statement within the then is executed,
  * and if the condition is false and the else exists, the statement within
  * the else is executed.
+ * 
  * @author Rishab Parthasarathy
  * @version 05.08.2020
  */
@@ -66,13 +67,17 @@ public class If extends Statement
     public void compile(Emitter e)
     {
         int i = e.nextLabelID();
-        c.compile(e, "endif" + i);
+        c.compile(e, "elseif" + i);
         s1.compile(e);
-        e.emit("endif" + i + ":");
-        e.emit("#jump statement for the " + i + "th if");
+        e.emit("j endif" + i);
+        e.emit("elseif" + i + ":");
+        e.emit("#jump statement for the " + i + "th else");
         if (s2 != null)
         {
             s2.compile(e);
         }
+        e.emit("endif" + i + ":");
+        e.emit("#jump statement for the " + i + "th if");
+        
     }
 }
