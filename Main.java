@@ -24,12 +24,12 @@ public class Main
      */
     public static void main(String[] args) throws IOException
     {
-        BufferedReader in = new BufferedReader(new FileReader("parser//parsertest9.txt"));
+        BufferedReader in = new BufferedReader(new FileReader("parser//parsertest7.txt"));
         Scanner sc = new Scanner(in);
         Parser p = new Parser(sc);
         Environment env = new Environment(null);
         Emitter e = new Emitter("output.asm");
-        p.parseProgram().compile(e);
+        p.parseProgram().exec(env);
         e.close();
     }   
 }

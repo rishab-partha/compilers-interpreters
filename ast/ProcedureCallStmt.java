@@ -45,6 +45,7 @@ public class ProcedureCallStmt extends Statement
     public void exec(Environment env)
     {
         Environment par = env.getPar();
+        System.out.println(par);
         Environment env1 = new Environment(par);
         ProcedureDeclaration dec = env.getProcedure(name);
         List<String> params = dec.getParams();
